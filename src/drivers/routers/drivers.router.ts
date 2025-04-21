@@ -1,16 +1,22 @@
 import { Request, Response, Router } from 'express';
-import { DriverInputDto } from '../dto/driver.input-dto';
+import { DriverInput } from '../dto/driver.input';
 import { vehicleInputDtoValidation } from '../validation/vehicleInputDtoValidation';
 import { HttpStatus } from '../../core/types/http-statuses';
 import { createErrorMessages } from '../../core/utils/error.utils';
 import { Driver } from '../types/driver';
 import { db } from '../../db/in-memory.db';
+import { mapToDriverListOutput } from './mappers/map-list-drivers-to-output';
+import { mapToDriverOutput } from './mappers/map-driver-to-output';
+import { DriverUpdateInput } from '../dto/driver-update.input';
+import { DriverListOutput } from '../dto/driver-list.output';
+import { DriverCreateInput } from '../dto/driver-create.input';
 
 export const driversRouter = Router({});
 
 driversRouter
-  .get('', (req: Request, res: Response) => {
-    res.status(200).send(db.drivers);
+  .get('', (req: Request, res: Response<DriverListOutput>) => {
+    const drivers = mapToDriverListOutput(db.drivers);
+    res.status(200).send(drivers);
   })
 
   .get('/:id', (req: Request, res: Response) => {
@@ -25,11 +31,11 @@ driversRouter
         );
       return;
     }
-    res.status(200).send(driver);
+    res.status(200).send(mapToDriverOutput(driver));
   })
 
-  .post('', (req: Request<{}, {}, DriverInputDto>, res: Response) => {
-    const errors = vehicleInputDtoValidation(req.body);
+  .post('', (req: Request<{}, {}, DriverCreateInput>, res: Response) => {
+    const errors = vehicleInputDtoValidation(req.body.data);
 
     if (errors.length > 0) {
       res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
@@ -37,56 +43,63 @@ driversRouter
     }
 
     const newDriver: Driver = {
-      id: db.drivers.length ? db.drivers[db.drivers.length - 1].id + 1 : 1,
-      name: req.body.name,
-      phoneNumber: req.body.phoneNumber,
-      email: req.body.email,
-      vehicleMake: req.body.vehicleMake,
-      vehicleModel: req.body.vehicleModel,
-      vehicleYear: req.body.vehicleYear,
-      vehicleLicensePlate: req.body.vehicleLicensePlate,
-      vehicleDescription: req.body.vehicleDescription,
-      vehicleFeatures: req.body.vehicleFeatures,
+      id: new Date().getTime(),
+      name: req.body.data.attributes.name,
+      phoneNumber: req.body.data.attributes.phoneNumber,
+      email: req.body.data.attributes.email,
+      vehicleMake: req.body.data.attributes.vehicleMake,
+      vehicleModel: req.body.data.attributes.vehicleModel,
+      vehicleYear: req.body.data.attributes.vehicleYear,
+      vehicleLicensePlate: req.body.data.attributes.vehicleLicensePlate,
+      vehicleDescription: req.body.data.attributes.vehicleDescription,
+      vehicleFeatures: req.body.data.attributes.vehicleFeatures,
       createdAt: new Date(),
     };
     db.drivers.push(newDriver);
-    res.status(HttpStatus.Created).send(newDriver);
+    const mappedDriver = mapToDriverOutput(newDriver);
+    res.status(HttpStatus.Created).send(mappedDriver);
   })
 
-  .put('/:id', (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
-    const index = db.drivers.findIndex((v) => v.id === id);
+  .put(
+    '/:id',
+    (req: Request<{ id: string }, {}, DriverUpdateInput>, res: Response) => {
+      console.log('in put: ', req.body.data);
+      const id = parseInt(req.params.id);
+      const index = db.drivers.findIndex((v) => v.id === id);
 
-    if (index === -1) {
-      res
-        .status(HttpStatus.NotFound)
-        .send(
-          createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]),
-        );
-      return;
-    }
+      if (index === -1) {
+        res
+          .status(HttpStatus.NotFound)
+          .send(
+            createErrorMessages([
+              { field: 'id', message: 'Vehicle not found' },
+            ]),
+          );
+        return;
+      }
 
-    const errors = vehicleInputDtoValidation(req.body);
+      const errors = vehicleInputDtoValidation(req.body.data);
 
-    if (errors.length > 0) {
-      res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
-      return;
-    }
+      if (errors.length > 0) {
+        res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+        return;
+      }
 
-    const driver = db.drivers[index];
+      const driver = db.drivers[index];
 
-    driver.name = req.body.name;
-    driver.phoneNumber = req.body.phoneNumber;
-    driver.email = req.body.email;
-    driver.vehicleMake = req.body.vehicleMake;
-    driver.vehicleModel = req.body.vehicleModel;
-    driver.vehicleYear = req.body.vehicleYear;
-    driver.vehicleLicensePlate = req.body.vehicleLicensePlate;
-    driver.vehicleDescription = req.body.vehicleDescription;
-    driver.vehicleFeatures = req.body.vehicleFeatures;
+      driver.name = req.body.data.attributes.name;
+      driver.phoneNumber = req.body.data.attributes.phoneNumber;
+      driver.email = req.body.data.attributes.email;
+      driver.vehicleMake = req.body.data.attributes.vehicleMake;
+      driver.vehicleModel = req.body.data.attributes.vehicleModel;
+      driver.vehicleYear = req.body.data.attributes.vehicleYear;
+      driver.vehicleLicensePlate = req.body.data.attributes.vehicleLicensePlate;
+      driver.vehicleDescription = req.body.data.attributes.vehicleDescription;
+      driver.vehicleFeatures = req.body.data.attributes.vehicleFeatures;
 
-    res.sendStatus(HttpStatus.NoContent);
-  })
+      res.sendStatus(HttpStatus.NoContent);
+    },
+  )
 
   .delete('/:id', (req: Request, res: Response) => {
     const id = parseInt(req.params.id);

@@ -1,69 +1,81 @@
-import { DriverInputDto } from '../dto/driver.input-dto';
+import { DriverInput } from '../dto/driver.input';
 import { VehicleFeature } from '../types/driver';
 import { ValidationError } from '../types/validationError';
+import { DriverCreateInput } from '../dto/driver-create.input';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const vehicleInputDtoValidation = (
-  data: DriverInputDto,
+  data: DriverInput,
 ): ValidationError[] => {
   const errors: ValidationError[] = [];
-
+  console.log('validation data: ', data);
+  const {
+    name,
+    phoneNumber,
+    email,
+    vehicleMake,
+    vehicleFeatures,
+    vehicleModel,
+    vehicleYear,
+    vehicleLicensePlate,
+    vehicleDescription,
+  } = data.attributes;
   if (
-    !data.name ||
-    typeof data.name !== 'string' ||
-    data.name.trim().length < 2 ||
-    data.name.trim().length > 15
+    !name ||
+    typeof name !== 'string' ||
+    name.trim().length < 2 ||
+    name.trim().length > 15
   ) {
     errors.push({ field: 'name', message: 'Invalid name' });
   }
 
   if (
-    !data.phoneNumber ||
-    typeof data.phoneNumber !== 'string' ||
-    data.phoneNumber.trim().length < 8 ||
-    data.phoneNumber.trim().length > 15
+    !phoneNumber ||
+    typeof phoneNumber !== 'string' ||
+    phoneNumber.trim().length < 8 ||
+    phoneNumber.trim().length > 15
   ) {
     errors.push({ field: 'phoneNumber', message: 'Invalid phoneNumber' });
   }
 
   if (
-    !data.email ||
-    typeof data.email !== 'string' ||
-    data.email.trim().length < 5 ||
-    data.email.trim().length > 100 ||
-    !EMAIL_REGEX.test(data.email)
+    !email ||
+    typeof email !== 'string' ||
+    email.trim().length < 5 ||
+    email.trim().length > 100 ||
+    !EMAIL_REGEX.test(email)
   ) {
     errors.push({ field: 'email', message: 'Invalid email' });
   }
 
   if (
-    !data.vehicleMake ||
-    typeof data.vehicleMake !== 'string' ||
-    data.vehicleMake.trim().length < 3 ||
-    data.vehicleMake.trim().length > 100
+    !vehicleMake ||
+    typeof vehicleMake !== 'string' ||
+    vehicleMake.trim().length < 3 ||
+    vehicleMake.trim().length > 100
   ) {
     errors.push({ field: 'vehicleMake', message: 'Invalid vehicleMake' });
   }
 
   if (
-    !data.vehicleModel ||
-    typeof data.vehicleModel !== 'string' ||
-    data.vehicleModel.trim().length < 2 ||
-    data.vehicleModel.trim().length > 100
+    !vehicleModel ||
+    typeof vehicleModel !== 'string' ||
+    vehicleModel.trim().length < 2 ||
+    vehicleModel.trim().length > 100
   ) {
     errors.push({ field: 'vehicleModel', message: 'Invalid vehicleModel' });
   }
 
-  if (!data.vehicleYear || typeof data.vehicleYear !== 'number') {
+  if (!vehicleYear || typeof vehicleYear !== 'number') {
     errors.push({ field: 'vehicleYear', message: 'Invalid vehicleYear' });
   }
 
   if (
-    !data.vehicleLicensePlate ||
-    typeof data.vehicleLicensePlate !== 'string' ||
-    data.vehicleLicensePlate.trim().length < 6 ||
-    data.vehicleLicensePlate.trim().length > 10
+    !vehicleLicensePlate ||
+    typeof vehicleLicensePlate !== 'string' ||
+    vehicleLicensePlate.trim().length < 6 ||
+    vehicleLicensePlate.trim().length > 10
   ) {
     errors.push({
       field: 'vehicleLicensePlate',
@@ -72,10 +84,10 @@ export const vehicleInputDtoValidation = (
   }
 
   if (
-    data.vehicleDescription !== null &&
-    (typeof data.vehicleDescription !== 'string' ||
-      data.vehicleDescription.trim().length < 10 ||
-      data.vehicleDescription.trim().length > 200)
+    vehicleDescription !== null &&
+    (typeof vehicleDescription !== 'string' ||
+      vehicleDescription.trim().length < 10 ||
+      vehicleDescription.trim().length > 200)
   ) {
     errors.push({
       field: 'vehicleDescription',
@@ -83,23 +95,23 @@ export const vehicleInputDtoValidation = (
     });
   }
 
-  if (!Array.isArray(data.vehicleFeatures)) {
+  if (!Array.isArray(vehicleFeatures)) {
     errors.push({
       field: 'vehicleFeatures',
       message: 'vehicleFeatures must be array',
     });
-  } else if (data.vehicleFeatures.length) {
+  } else if (vehicleFeatures.length) {
     const existingFeatures = Object.values(VehicleFeature);
     if (
-      data.vehicleFeatures.length > existingFeatures.length ||
-      data.vehicleFeatures.length < 1
+      vehicleFeatures.length > existingFeatures.length ||
+      vehicleFeatures.length < 1
     ) {
       errors.push({
         field: 'vehicleFeatures',
         message: 'Invalid vehicleFeatures',
       });
     }
-    for (const feature of data.vehicleFeatures) {
+    for (const feature of vehicleFeatures) {
       if (!existingFeatures.includes(feature)) {
         errors.push({
           field: 'features',
