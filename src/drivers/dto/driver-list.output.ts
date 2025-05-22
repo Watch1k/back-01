@@ -1,4 +1,3 @@
-import { DriverOutput } from './driver.output';
 import { ResourceType } from '../../core/types/resource-type';
 import { VehicleFeature } from '../types/driver';
 

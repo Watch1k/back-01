@@ -1,7 +1,13 @@
 import { Driver, VehicleFeature } from '../drivers/types/driver';
+import { Video } from '../videos/types/video';
 
-export const db = {
-  drivers: <Driver[]>[
+interface Database {
+  drivers: Driver[];
+  videos: Video[];
+}
+
+export const db: Database = {
+  drivers: [
     {
       id: 1,
       name: 'Tom Rider',
@@ -40,6 +46,38 @@ export const db = {
       vehicleDescription: null,
       vehicleFeatures: [],
       createdAt: new Date(),
+    },
+  ],
+  videos: [
+    {
+      id: 1,
+      title: 'Getting Started with TypeScript',
+      author: 'John Smith',
+      canBeDownloaded: true,
+      minAgeRestriction: 16,
+      createdAt: '2024-03-15T10:00:00.000Z',
+      publicationDate: '2024-03-16T10:00:00.000Z',
+      availableResolutions: ['P144'],
+    },
+    {
+      id: 2,
+      title: 'Advanced JavaScript Patterns',
+      author: 'Emma Wilson',
+      canBeDownloaded: false,
+      minAgeRestriction: null,
+      createdAt: '2024-03-14T15:30:00.000Z',
+      publicationDate: '2024-03-15T12:00:00.000Z',
+      availableResolutions: ['P240', 'P240'],
+    },
+    {
+      id: 3,
+      title: 'Web Development Best Practices',
+      author: 'Michael Chen',
+      canBeDownloaded: true,
+      minAgeRestriction: 13,
+      createdAt: '2024-03-13T09:45:00.000Z',
+      publicationDate: '2024-03-14T09:45:00.000Z',
+      availableResolutions: ['P144', 'P144'],
     },
   ],
 };
