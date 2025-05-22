@@ -8,7 +8,7 @@ export const setupApp = (app: Express) => {
   app.use(express.json());
 
   app.get('/', (req: Request, res: Response) => {
-    res.status(200).send('hello world!!!');
+    res.status(200).send('hello world2!!!');
   });
 
   app.use('/api/drivers', driversRouter);
