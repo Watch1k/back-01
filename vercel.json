@@ -5,18 +5,6 @@
     { "src": "src/index.ts", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/api/swagger-ui-bundle\\.js",
-      "dest": "/node_modules/swagger-ui-express/static/swagger-ui-bundle.js"
-    },
-    {
-      "src": "/api/swagger-ui-standalone-preset\\.js",
-      "dest": "/node_modules/swagger-ui-express/static/swagger-ui-standalone-preset.js"
-    },
-    {
-      "src": "/api/swagger-ui\\.css",
-      "dest": "/node_modules/swagger-ui-express/static/swagger-ui.css"
-    },
     { "src": "/(.*)", "dest": "src/index.ts" }
   ]
 }
