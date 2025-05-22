@@ -1,19 +1,17 @@
+
 {
-
   "version": 2,
-
-  "name": "music-album",
-
+  "name": "videos-list",
   "builds": [
-
     { "src": "src/index.ts", "use": "@vercel/node" }
-
   ],
-
   "routes": [
-
+    { "src": "/api/swagger-ui.css", "dest": "src/index.ts" },
+    { "src": "/api/swagger-ui-bundle.js", "dest": "src/index.ts" },
+    { "src": "/api/swagger-ui-standalone-preset.js", "dest": "src/index.ts" },
+    { "src": "/api/swagger-ui-init.js", "dest": "src/index.ts" },
+    { "src": "/api/swagger-ui", "dest": "src/index.ts" },
+    { "src": "/api/(.*)", "dest": "src/index.ts" },
     { "src": "/(.*)", "dest": "src/index.ts" }
-
   ]
-
 }
