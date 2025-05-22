@@ -24,5 +24,21 @@ const options = {
 const swaggerSpec = swaggerJsDoc(options);
 
 export const setupSwagger = (app: Express) => {
-  app.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+  // Setup Swagger UI with explicit options to ensure proper asset serving
+  const swaggerUiOpts = {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    swaggerOptions: {
+      url: '/api/swagger.json',
+    },
+  };
+
+  // Serve the Swagger spec as JSON
+  app.get('/api/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
+
+  // Setup Swagger UI
+  app.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerSpec, swaggerUiOpts));
 };
