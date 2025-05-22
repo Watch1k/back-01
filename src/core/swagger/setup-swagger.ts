@@ -28,6 +28,11 @@ export const setupSwagger = (app: Express) => {
   const swaggerUiOpts = {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
+    customCssUrl: '/public/css/swagger-ui.css',
+    customJs: [
+      '/public/js/swagger-ui-bundle.js',
+      '/public/js/swagger-ui-standalone-preset.js',
+    ],
     swaggerOptions: {
       url: '/api/swagger.json',
     },
