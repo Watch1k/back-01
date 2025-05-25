@@ -1,8 +1,8 @@
 import express, { Express, Request, Response } from 'express';
-import { driversRouter } from './drivers/routers/drivers.router';
 import { testingRouter } from './testing/routers/testing.router';
 import { videosRouter } from './videos/routers/videos.router';
 import { setupSwagger } from './core/swagger/setup-swagger';
+import { TESTING_PATH, VIDEOS_PATH } from './core/paths/paths';
 
 export const setupApp = (app: Express) => {
   app.use(express.json());
@@ -11,9 +11,8 @@ export const setupApp = (app: Express) => {
     res.status(200).send('hello world2!!!');
   });
 
-  app.use('/api/drivers', driversRouter);
-  app.use('/api/videos', videosRouter);
-  app.use('/api/testing', testingRouter);
+  app.use(VIDEOS_PATH, videosRouter);
+  app.use(TESTING_PATH, testingRouter);
 
   setupSwagger(app);
   return app;
