@@ -66,7 +66,8 @@ export const db: Database = {
       id: '1',
       title: 'Introduction to TypeScript',
       shortDescription: 'Learn the basics of TypeScript and its benefits',
-      content: 'TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.',
+      content:
+        'TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.',
       blogId: '1',
       blogName: 'Technology Insights',
       createdAt: '2024-03-15T10:00:00.000Z',
@@ -75,7 +76,8 @@ export const db: Database = {
       id: '2',
       title: 'Modern CSS Techniques',
       shortDescription: 'Exploring the latest CSS features and methodologies',
-      content: 'CSS has evolved significantly in recent years. This post covers modern techniques like CSS Grid, Flexbox, and CSS Variables.',
+      content:
+        'CSS has evolved significantly in recent years. This post covers modern techniques like CSS Grid, Flexbox, and CSS Variables.',
       blogId: '2',
       blogName: 'Web Development Blog',
       createdAt: '2024-03-14T15:30:00.000Z',
@@ -83,8 +85,10 @@ export const db: Database = {
     {
       id: '3',
       title: 'Understanding Recursion',
-      shortDescription: 'A deep dive into recursive functions and their applications',
-      content: 'Recursion is a powerful programming concept where a function calls itself to solve a problem. This post explains how it works and when to use it.',
+      shortDescription:
+        'A deep dive into recursive functions and their applications',
+      content:
+        'Recursion is a powerful programming concept where a function calls itself to solve a problem. This post explains how it works and when to use it.',
       blogId: '3',
       blogName: 'Programming Fundamentals',
       createdAt: '2024-03-13T09:45:00.000Z',
@@ -93,7 +97,8 @@ export const db: Database = {
       id: '4',
       title: 'API Design Best Practices',
       shortDescription: 'Guidelines for creating robust and user-friendly APIs',
-      content: 'Designing good APIs is crucial for developer experience. This post covers naming conventions, error handling, and versioning strategies.',
+      content:
+        'Designing good APIs is crucial for developer experience. This post covers naming conventions, error handling, and versioning strategies.',
       blogId: '1',
       blogName: 'Technology Insights',
       createdAt: '2024-03-12T14:20:00.000Z',
