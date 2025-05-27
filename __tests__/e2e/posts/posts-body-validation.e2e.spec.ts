@@ -51,7 +51,7 @@ describe('Post API body validation check', () => {
       .set('Authorization', authHeader)
       .send({
         ...correctPostData,
-        title: '',
+        title: '     ',
         blogId,
       })
       .expect(HttpStatus.BadRequest);
