@@ -29,7 +29,6 @@ export const postsRepository = {
       content: post.content,
       blogId: post.blogId,
       blogName: blog.name,
-      createdAt: new Date().toISOString(),
     };
 
     db.posts.push(newPost);
@@ -68,7 +67,6 @@ export const postsRepository = {
       content: data.input.content,
       blogId: data.input.blogId,
       blogName: blog.name,
-      createdAt: post.createdAt,
     };
 
     db.posts[index] = updatedPost;
