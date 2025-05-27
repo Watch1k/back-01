@@ -25,6 +25,23 @@ describe('Blog API body validation check', () => {
   const authHeader = generateBasicAuthToken();
 
   it('should not create blog when name is invalid', async () => {
+    // Name with only whitespaces
+    const whitespaceNameResponse = await request(app)
+      .post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send({
+        ...correctBlogData,
+        name: '    ',
+      })
+      .expect(HttpStatus.BadRequest);
+
+    expect(whitespaceNameResponse.body.errorsMessages).toBeDefined();
+    expect(
+      whitespaceNameResponse.body.errorsMessages.some(
+        (e: ValidationError) => e.field === 'name',
+      ),
+    ).toBe(true);
+
     // Empty name
     const emptyNameResponse = await request(app)
       .post('/api/blogs')
@@ -78,6 +95,23 @@ describe('Blog API body validation check', () => {
   });
 
   it('should not create blog when description is invalid', async () => {
+    // Description with only whitespaces
+    const whitespaceDescriptionResponse = await request(app)
+      .post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send({
+        ...correctBlogData,
+        description: '    ',
+      })
+      .expect(HttpStatus.BadRequest);
+
+    expect(whitespaceDescriptionResponse.body.errorsMessages).toBeDefined();
+    expect(
+      whitespaceDescriptionResponse.body.errorsMessages.some(
+        (e: ValidationError) => e.field === 'description',
+      ),
+    ).toBe(true);
+
     // Empty description
     const emptyDescriptionResponse = await request(app)
       .post('/api/blogs')
@@ -131,6 +165,23 @@ describe('Blog API body validation check', () => {
   });
 
   it('should not create blog when websiteUrl is invalid', async () => {
+    // WebsiteUrl with only whitespaces
+    const whitespaceWebsiteUrlResponse = await request(app)
+      .post('/api/blogs')
+      .set('Authorization', authHeader)
+      .send({
+        ...correctBlogData,
+        websiteUrl: '    ',
+      })
+      .expect(HttpStatus.BadRequest);
+
+    expect(whitespaceWebsiteUrlResponse.body.errorsMessages).toBeDefined();
+    expect(
+      whitespaceWebsiteUrlResponse.body.errorsMessages.some(
+        (e: ValidationError) => e.field === 'websiteUrl',
+      ),
+    ).toBe(true);
+
     // Empty websiteUrl
     const emptyWebsiteUrlResponse = await request(app)
       .post('/api/blogs')
