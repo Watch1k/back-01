@@ -2,7 +2,12 @@ import express, { Express, Request, Response } from 'express';
 import { testingRouter } from './testing/routers/testing.router';
 import { videosRouter } from './videos/routers/videos.router';
 import { setupSwagger } from './core/swagger/setup-swagger';
-import { BLOGS_PATH, POSTS_PATH, TESTING_PATH, VIDEOS_PATH } from './core/paths/paths';
+import {
+  BLOGS_PATH,
+  POSTS_PATH,
+  TESTING_PATH,
+  VIDEOS_PATH,
+} from './core/paths/paths';
 import { blogsRouter } from './blogs/routers/blogs.router';
 import { postsRouter } from './posts/routers/posts.router';
 
