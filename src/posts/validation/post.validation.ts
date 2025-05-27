@@ -8,7 +8,6 @@ const titleValidation = body('title')
   .withMessage('Invalid title. Max length is 30 characters.')
   .notEmpty()
   .withMessage('Invalid title. Max length is 30 characters.')
-  .trim()
   .isLength({ max: 30 })
   .withMessage('Invalid title. Max length is 30 characters.');
 
@@ -19,7 +18,6 @@ const shortDescriptionValidation = body('shortDescription')
   .withMessage('Invalid shortDescription. Max length is 100 characters.')
   .notEmpty()
   .withMessage('Invalid shortDescription. Max length is 100 characters.')
-  .trim()
   .isLength({ max: 100 })
   .withMessage('Invalid shortDescription. Max length is 100 characters.');
 
@@ -30,7 +28,6 @@ const contentValidation = body('content')
   .withMessage('Invalid content. Max length is 1000 characters.')
   .notEmpty()
   .withMessage('Invalid content. Max length is 1000 characters.')
-  .trim()
   .isLength({ max: 1000 })
   .withMessage('Invalid content. Max length is 1000 characters.');
 
@@ -41,7 +38,6 @@ const blogIdValidation = body('blogId')
   .withMessage('Invalid blogId.')
   .notEmpty()
   .withMessage('Invalid blogId.')
-  .trim()
   .custom((value) => {
     const blog = blogsRepository.findBlog(value);
     if (!blog) {

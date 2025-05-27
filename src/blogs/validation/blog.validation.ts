@@ -7,7 +7,6 @@ const nameValidation = body('name')
   .withMessage('Invalid name. Max length is 15 characters.')
   .notEmpty()
   .withMessage('Invalid name. Max length is 15 characters.')
-  .trim()
   .isLength({ max: 15 })
   .withMessage('Invalid name. Max length is 15 characters.');
 
@@ -18,7 +17,6 @@ const descriptionValidation = body('description')
   .withMessage('Invalid description. Max length is 500 characters.')
   .notEmpty()
   .withMessage('Invalid description. Max length is 500 characters.')
-  .trim()
   .isLength({ max: 500 })
   .withMessage('Invalid description. Max length is 500 characters.');
 
@@ -29,7 +27,6 @@ const websiteUrlValidation = body('websiteUrl')
   .withMessage('Invalid websiteUrl. Max length is 100 characters.')
   .notEmpty()
   .withMessage('Invalid websiteUrl. Max length is 100 characters.')
-  .trim()
   .isLength({ max: 100 })
   .withMessage('Invalid websiteUrl. Max length is 100 characters.')
   .matches(

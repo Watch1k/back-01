@@ -145,9 +145,8 @@ describe('Post API', () => {
     expect(postResponse.status).toBe(HttpStatus.Ok);
 
     expect(postResponse.body).toEqual({
+      ...createResponse.body,
       ...postUpdateData,
-      id: createResponse.body.id,
-      createdAt: createResponse.body.createdAt,
     });
   });
 

@@ -8,7 +8,6 @@ const titleValidation = body('title')
   .withMessage('Invalid title. Max length is 40 characters.')
   .notEmpty()
   .withMessage('Invalid title. Max length is 40 characters.')
-  .trim()
   .isLength({ max: 40 })
   .withMessage('Invalid title. Max length is 40 characters.');
 
@@ -19,7 +18,6 @@ const authorValidation = body('author')
   .withMessage('Invalid author. Max length is 20 characters.')
   .notEmpty()
   .withMessage('Invalid author. Max length is 20 characters.')
-  .trim()
   .isLength({ max: 20 })
   .withMessage('Invalid author. Max length is 20 characters.');
 
