@@ -1,7 +1,8 @@
-import { ValidationError } from '../../videos/types/validationError';
+import { ValidationError } from '../types/validationError';
+import { ValidationErrorDto } from '../types/validationError.dto';
 
 export const createErrorMessages = (
   errors: ValidationError[],
-): { errorsMessages: ValidationError[] } => {
+): ValidationErrorDto => {
   return { errorsMessages: errors };
 };

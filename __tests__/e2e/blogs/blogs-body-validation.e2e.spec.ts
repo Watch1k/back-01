@@ -3,7 +3,7 @@ import { setupApp } from '../../../src/setup-app';
 import express from 'express';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { ValidationError } from '../../../src/videos/types/validationError';
+import { ValidationError } from '../../../src/core/types/validationError';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 
 describe('Blog API body validation check', () => {

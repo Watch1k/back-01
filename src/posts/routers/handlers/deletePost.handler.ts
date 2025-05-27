@@ -9,7 +9,8 @@ export const deletePostHandler = (
   const result = postsRepository.deletePost(req.params.id);
 
   if (!result.success) {
-    return res.sendStatus(HttpStatus.NotFound);
+    res.sendStatus(HttpStatus.NotFound);
+    return;
   }
 
   res.sendStatus(HttpStatus.NoContent);

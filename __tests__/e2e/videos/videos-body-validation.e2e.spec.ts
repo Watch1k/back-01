@@ -4,7 +4,7 @@ import express from 'express';
 import { VideoCreateInput } from '../../../src/videos/dto/video-create.input';
 import { VideoResolution } from '../../../src/videos/types/video';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { ValidationError } from '../../../src/videos/types/validationError';
+import { ValidationError } from '../../../src/core/types/validationError';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 
 describe('Video API body validation check', () => {
