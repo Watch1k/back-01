@@ -5,6 +5,7 @@ import { VideoCreateInput } from '../../../src/videos/dto/video-create.input';
 import { VideoResolution } from '../../../src/videos/types/video';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { ValidationError } from '../../../src/videos/types/validationError';
+import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 
 describe('Video API body validation check', () => {
   const app = express();
@@ -22,10 +23,13 @@ describe('Video API body validation check', () => {
       .expect(HttpStatus.NoContent);
   });
 
+  const authHeader = generateBasicAuthToken();
+
   it('should not create video when title is invalid', async () => {
     // Empty title
     const emptyTitleResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         title: '',
@@ -42,6 +46,7 @@ describe('Video API body validation check', () => {
     // Title too long (more than 40 characters)
     const longTitleResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         title: 'a'.repeat(41),
@@ -58,6 +63,7 @@ describe('Video API body validation check', () => {
     // Non-string title
     const nonStringTitleResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         title: 123,
@@ -76,6 +82,7 @@ describe('Video API body validation check', () => {
     // Empty author
     const emptyAuthorResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         author: '',
@@ -92,6 +99,7 @@ describe('Video API body validation check', () => {
     // Author too long (more than 20 characters)
     const longAuthorResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         author: 'a'.repeat(21),
@@ -108,6 +116,7 @@ describe('Video API body validation check', () => {
     // Non-string author
     const nonStringAuthorResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         author: 123,
@@ -126,6 +135,7 @@ describe('Video API body validation check', () => {
     // Empty availableResolutions
     const emptyResolutionsResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         availableResolutions: [],
@@ -142,6 +152,7 @@ describe('Video API body validation check', () => {
     // Invalid resolution value
     const invalidResolutionResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         availableResolutions: ['InvalidResolution'],
@@ -158,6 +169,7 @@ describe('Video API body validation check', () => {
     // Non-array availableResolutions
     const nonArrayResolutionsResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send({
         ...correctVideoData,
         availableResolutions: 'P144',
@@ -176,6 +188,7 @@ describe('Video API body validation check', () => {
     // First create a valid video
     const createResponse = await request(app)
       .post('/api/videos')
+      .set('Authorization', authHeader)
       .send(correctVideoData)
       .expect(HttpStatus.Created);
 
@@ -184,6 +197,7 @@ describe('Video API body validation check', () => {
     // Test invalid title
     const invalidTitleResponse = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: '',
         author: 'Updated Author',
@@ -204,6 +218,7 @@ describe('Video API body validation check', () => {
     // Test invalid author
     const invalidAuthorResponse = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: '',
@@ -224,6 +239,7 @@ describe('Video API body validation check', () => {
     // Test invalid availableResolutions
     const invalidResolutionsResponse = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: 'Updated Author',
@@ -244,6 +260,7 @@ describe('Video API body validation check', () => {
     // Test invalid canBeDownloaded
     const invalidCanBeDownloadedResponse = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: 'Updated Author',
@@ -264,6 +281,7 @@ describe('Video API body validation check', () => {
     // Test invalid minAgeRestriction (below minimum)
     const invalidMinAgeResponse1 = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: 'Updated Author',
@@ -284,6 +302,7 @@ describe('Video API body validation check', () => {
     // Test invalid minAgeRestriction (above maximum)
     const invalidMinAgeResponse2 = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: 'Updated Author',
@@ -304,6 +323,7 @@ describe('Video API body validation check', () => {
     // Test invalid publicationDate
     const invalidPublicationDateResponse = await request(app)
       .put(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .send({
         title: 'Updated Title',
         author: 'Updated Author',
@@ -324,6 +344,7 @@ describe('Video API body validation check', () => {
     // Verify the video wasn't updated
     const getResponse = await request(app)
       .get(`/api/videos/${videoId}`)
+      .set('Authorization', authHeader)
       .expect(HttpStatus.Ok);
 
     expect(getResponse.body.title).toBe(correctVideoData.title);

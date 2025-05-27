@@ -3,19 +3,11 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 import { VideoUpdateInput } from '../../dto/video-update.input';
 import { videosRepository } from '../../repositories/videos-repository';
-import { videoInputDtoValidation } from '../../validation/videoInputDtoValidation';
 
 export const updateVideoHandler = (
   req: Request<{ id: string }, {}, VideoUpdateInput>,
   res: Response,
 ) => {
-  const errors = videoInputDtoValidation(req.body);
-
-  if (errors.length > 0) {
-    res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
-    return;
-  }
-
   const id = parseInt(req.params.id);
   const updateResult = videosRepository.updateVideo({
     id,

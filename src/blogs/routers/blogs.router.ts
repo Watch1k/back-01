@@ -1,48 +1,48 @@
 import { Router } from 'express';
 import {
-  getAllVideosHandler,
-  getVideoByIdHandler,
-  createVideoHandler,
-  updateVideoHandler,
-  deleteVideoHandler,
+  getAllBlogsHandler,
+  getBlogByIdHandler,
+  createBlogHandler,
+  updateBlogHandler,
+  deleteBlogHandler,
 } from './handlers';
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validtion-result.middleware';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation-middleware';
 import {
-  createVideoValidation,
-  updateVideoValidation,
-} from '../validation/video.validation';
+  createBlogValidation,
+  updateBlogValidation,
+} from '../validation/blog.validation';
 import { adminGuardMiddleware } from '../../auth/middlewares/admin.guard-middleware';
 
-export const videosRouter = Router({});
+export const blogsRouter = Router({});
 
-videosRouter
-  .get('', getAllVideosHandler)
+blogsRouter
+  .get('', getAllBlogsHandler)
   .get(
     '/:id',
     idValidation,
     inputValidationResultMiddleware,
-    getVideoByIdHandler,
+    getBlogByIdHandler,
   )
   .post(
     '',
     adminGuardMiddleware,
-    createVideoValidation,
+    createBlogValidation,
     inputValidationResultMiddleware,
-    createVideoHandler,
+    createBlogHandler,
   )
   .put(
     '/:id',
     adminGuardMiddleware,
     idValidation,
-    updateVideoValidation,
+    updateBlogValidation,
     inputValidationResultMiddleware,
-    updateVideoHandler,
+    updateBlogHandler,
   )
   .delete(
     '/:id',
     adminGuardMiddleware,
     idValidation,
     inputValidationResultMiddleware,
-    deleteVideoHandler,
+    deleteBlogHandler,
   );

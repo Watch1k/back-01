@@ -5,6 +5,7 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { VideoResolution } from '../../../src/videos/types/video';
 import { VideoCreateInput } from '../../../src/videos/dto/video-create.input';
 import { VideoUpdateInput } from '../../../src/videos/dto/video-update.input';
+import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 
 describe('Video API', () => {
   const app = express();
@@ -16,10 +17,20 @@ describe('Video API', () => {
     availableResolutions: [VideoResolution.Resolution144p],
   };
 
+  // Helper function to set up authentication for requests
+  const authRequest = (
+    method: 'get' | 'post' | 'put' | 'delete',
+    path: string,
+  ) => {
+    return request(app)
+      [method](path)
+      .set('Authorization', generateBasicAuthToken());
+  };
+
   beforeAll(async () => {
-    await request(app)
-      .delete('/api/testing/all-data')
-      .expect(HttpStatus.NoContent);
+    await authRequest('delete', '/api/testing/all-data').expect(
+      HttpStatus.NoContent,
+    );
   });
 
   it('should create video; POST /api/videos', async () => {
@@ -28,8 +39,7 @@ describe('Video API', () => {
       title: 'New Test Video',
     };
 
-    await request(app)
-      .post('/api/videos')
+    await authRequest('post', '/api/videos')
       .send(newVideo)
       .expect(HttpStatus.Created);
   });
@@ -43,13 +53,11 @@ describe('Video API', () => {
       ...testVideoData,
       title: 'Another Test Video 2',
     };
-    await request(app)
-      .post('/api/videos')
+    await authRequest('post', '/api/videos')
       .send(newVideo1)
       .expect(HttpStatus.Created);
 
-    await request(app)
-      .post('/api/videos')
+    await authRequest('post', '/api/videos')
       .send(newVideo2)
       .expect(HttpStatus.Created);
 
@@ -66,8 +74,7 @@ describe('Video API', () => {
       ...testVideoData,
       title: 'Another Test Video 3',
     };
-    const createResponse = await request(app)
-      .post('/api/videos')
+    const createResponse = await authRequest('post', '/api/videos')
       .send(newVideo)
       .expect(HttpStatus.Created);
 
@@ -83,8 +90,7 @@ describe('Video API', () => {
       ...testVideoData,
       title: 'Another Test Video 4',
     };
-    const createResponse = await request(app)
-      .post('/api/videos')
+    const createResponse = await authRequest('post', '/api/videos')
       .send(newVideo)
       .expect(HttpStatus.Created);
 
@@ -102,8 +108,7 @@ describe('Video API', () => {
       ],
     };
 
-    await request(app)
-      .put(`/api/videos/${createResponse.body.id}`)
+    await authRequest('put', `/api/videos/${createResponse.body.id}`)
       .send(videoUpdateData)
       .expect(HttpStatus.NoContent);
 
@@ -123,14 +128,13 @@ describe('Video API', () => {
       ...testVideoData,
       title: 'Another Test Video 5',
     };
-    const createResponse = await request(app)
-      .post('/api/videos')
+    const createResponse = await authRequest('post', '/api/videos')
       .send(newVideo)
       .expect(HttpStatus.Created);
 
-    await request(app)
-      .delete(`/api/videos/${createResponse.body.id}`)
-      .expect(HttpStatus.NoContent);
+    await authRequest('delete', `/api/videos/${createResponse.body.id}`).expect(
+      HttpStatus.NoContent,
+    );
 
     const videoResponse = await request(app).get(
       `/api/videos/${createResponse.body.id}`,
@@ -144,8 +148,7 @@ describe('Video API', () => {
       title: '', // Invalid title (too short)
     };
 
-    const response = await request(app)
-      .post('/api/videos')
+    const response = await authRequest('post', '/api/videos')
       .send(invalidVideo)
       .expect(HttpStatus.BadRequest);
 
@@ -159,8 +162,7 @@ describe('Video API', () => {
       ...testVideoData,
       title: 'Video for Invalid Update Test',
     };
-    const createResponse = await request(app)
-      .post('/api/videos')
+    const createResponse = await authRequest('post', '/api/videos')
       .send(newVideo)
       .expect(HttpStatus.Created);
 
@@ -169,8 +171,10 @@ describe('Video API', () => {
       title: '', // Invalid title (too short)
     };
 
-    const response = await request(app)
-      .put(`/api/videos/${createResponse.body.id}`)
+    const response = await authRequest(
+      'put',
+      `/api/videos/${createResponse.body.id}`,
+    )
       .send(invalidUpdateData)
       .expect(HttpStatus.BadRequest);
 
@@ -199,8 +203,7 @@ describe('Video API', () => {
       availableResolutions: [VideoResolution.Resolution720p],
     };
 
-    const response = await request(app)
-      .put(`/api/videos/${nonExistentId}`)
+    const response = await authRequest('put', `/api/videos/${nonExistentId}`)
       .send(updateData)
       .expect(HttpStatus.NotFound);
 
@@ -210,9 +213,10 @@ describe('Video API', () => {
 
   it('should return 404 when deleting a non-existent video', async () => {
     const nonExistentId = 999999;
-    const response = await request(app)
-      .delete(`/api/videos/${nonExistentId}`)
-      .expect(HttpStatus.NotFound);
+    const response = await authRequest(
+      'delete',
+      `/api/videos/${nonExistentId}`,
+    ).expect(HttpStatus.NotFound);
 
     expect(response.body.errorsMessages).toBeDefined();
     expect(response.body.errorsMessages.length).toBeGreaterThan(0);

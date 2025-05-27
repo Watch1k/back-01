@@ -1,7 +1,11 @@
 import { Video } from '../videos/types/video';
+import { Blog } from '../blogs/types/blog';
+import { Post } from '../posts/types/post';
 
 interface Database {
   videos: Video[];
+  blogs: Blog[];
+  posts: Post[];
 }
 
 export const db: Database = {
@@ -37,4 +41,6 @@ export const db: Database = {
       availableResolutions: ['P144', 'P144'],
     },
   ],
+  blogs: [],
+  posts: [],
 };
