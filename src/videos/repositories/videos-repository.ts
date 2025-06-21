@@ -1,7 +1,8 @@
-import { db } from '../../db/in-memory.db';
 import { VideoCreateInput } from '../dto/video-create.input';
 import { Video } from '../types/video';
 import { VideoUpdateInput } from '../dto/video-update.input';
+import { videoCollection } from '../../db/mongo.db';
+import { ObjectId, WithId } from 'mongodb';
 
 type OperationResult<T = void> = {
   success: boolean;
@@ -10,16 +11,20 @@ type OperationResult<T = void> = {
 };
 
 export const videosRepository = {
-  getAllVideos: () => db.videos,
+  getAllVideos: () => videoCollection.find().toArray(),
 
-  findVideo: (id: number) => db.videos.find((v) => v.id === id),
+  findVideo: async (id: string) =>
+    await videoCollection.findOne({
+      _id: new ObjectId(id),
+    }),
 
-  createVideo: (video: VideoCreateInput) => {
+  createVideo: async (
+    video: VideoCreateInput,
+  ): Promise<OperationResult<WithId<Video>>> => {
     const newVideo: Video = {
       title: video.title,
       author: video.author,
       availableResolutions: video.availableResolutions,
-      id: new Date().getTime(),
       minAgeRestriction: null,
       publicationDate: new Date(
         new Date().getTime() + 24 * 60 * 60 * 1000,
@@ -28,26 +33,19 @@ export const videosRepository = {
       createdAt: new Date().toISOString(),
     };
 
-    db.videos.push(newVideo);
+    const resp = await videoCollection.insertOne(newVideo);
 
-    return newVideo;
+    return {
+      success: true,
+      message: `Video with id ${resp.insertedId} successfully created`,
+      data: { ...newVideo, _id: resp.insertedId },
+    };
   },
 
-  updateVideo: (data: {
-    id: number;
+  updateVideo: async (data: {
+    id: string;
     input: VideoUpdateInput;
-  }): OperationResult<Video> => {
-    const index = db.videos.findIndex((v) => v.id === data.id);
-
-    if (index === -1) {
-      return {
-        success: false,
-        message: `Video with id ${data.id} not found`,
-      };
-    }
-
-    const video = db.videos[index];
-
+  }): Promise<OperationResult<WithId<Video>>> => {
     const updatedVideo = {
       title: data.input.title,
       minAgeRestriction: data.input.minAgeRestriction,
@@ -55,30 +53,54 @@ export const videosRepository = {
       canBeDownloaded: data.input.canBeDownloaded,
       author: data.input.author,
       availableResolutions: data.input.availableResolutions,
-      id: video.id,
-      createdAt: video.createdAt,
     };
 
-    db.videos[index] = updatedVideo;
+    const updateResult = await videoCollection.updateOne(
+      {
+        _id: new ObjectId(data.id),
+      },
+      {
+        $set: updatedVideo,
+      },
+    );
+
+    if (updateResult.matchedCount < 1) {
+      return {
+        success: false,
+        message: `Video with id ${data.id} not found`,
+      };
+    }
+
+    const newVideo = await videoCollection.findOne({
+      id: data.id,
+    });
+
+    if (!newVideo) {
+      return {
+        success: false,
+        message: `Video with id ${data.id} not found`,
+      };
+    }
 
     return {
       success: true,
       message: `Video with id ${data.id} successfully updated`,
-      data: updatedVideo,
+      data: newVideo,
     };
   },
 
-  deleteVideo: (id: number): OperationResult => {
-    const index = db.videos.findIndex((v) => v.id === id);
+  deleteVideo: async (id: string): Promise<OperationResult> => {
+    const deleteResult = await videoCollection.deleteOne({
+      id: id,
+    });
 
-    if (index === -1) {
+    if (deleteResult.deletedCount < 1) {
       return {
         success: false,
         message: `Video with id ${id} not found`,
       };
     }
 
-    db.videos.splice(index, 1);
     return {
       success: true,
       message: `Video with id ${id} successfully deleted`,

@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { blogsRepository } from '../../repositories/blogs-repository';
 
-export const deleteBlogHandler = (
+export const deleteBlogHandler = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
-  const result = blogsRepository.deleteBlog(req.params.id);
+  const result = await blogsRepository.deleteBlog(req.params.id);
 
   if (!result.success) {
     res.status(HttpStatus.NotFound).send({

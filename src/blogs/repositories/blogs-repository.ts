@@ -1,7 +1,8 @@
-import { db } from '../../db/in-memory.db';
 import { BlogCreateInput } from '../dto/blog-create.input';
 import { Blog } from '../types/blog';
 import { BlogUpdateInput } from '../dto/blog-update.input';
+import { blogsCollection } from '../../db/mongo.db';
+import { ObjectId, WithId } from 'mongodb';
 
 type OperationResult<T = void> = {
   success: boolean;
@@ -10,65 +11,87 @@ type OperationResult<T = void> = {
 };
 
 export const blogsRepository = {
-  getAllBlogs: () => db.blogs,
+  getAllBlogs: () => blogsCollection.find().toArray(),
 
-  findBlog: (id: string) => db.blogs.find((b) => b.id === id),
+  findBlog: async (id: string) =>
+    await blogsCollection.findOne({
+      _id: new ObjectId(id),
+    }),
 
-  createBlog: (blog: BlogCreateInput) => {
+  createBlog: async (
+    blog: BlogCreateInput,
+  ): Promise<OperationResult<WithId<Blog>>> => {
     const newBlog: Blog = {
-      id: new Date().getTime().toString(),
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
     };
 
-    db.blogs.push(newBlog);
+    const resp = await blogsCollection.insertOne(newBlog);
 
-    return newBlog;
+    return {
+      success: true,
+      message: `Blog with id ${resp.insertedId} successfully created`,
+      data: { ...newBlog, _id: resp.insertedId },
+    };
   },
 
-  updateBlog: (data: {
+  updateBlog: async (data: {
     id: string;
     input: BlogUpdateInput;
-  }): OperationResult<Blog> => {
-    const index = db.blogs.findIndex((b) => b.id === data.id);
+  }): Promise<OperationResult<WithId<Blog>>> => {
+    const updatedBlog = {
+      name: data.input.name,
+      description: data.input.description,
+      websiteUrl: data.input.websiteUrl,
+    };
 
-    if (index === -1) {
+    const updateResult = await blogsCollection.updateOne(
+      {
+        _id: new ObjectId(data.id),
+      },
+      {
+        $set: updatedBlog,
+      },
+    );
+
+    if (updateResult.matchedCount < 1) {
       return {
         success: false,
         message: `Blog with id ${data.id} not found`,
       };
     }
 
-    const blog = db.blogs[index];
+    const newBlog = await blogsCollection.findOne({
+      _id: new ObjectId(data.id),
+    });
 
-    const updatedBlog = {
-      id: blog.id,
-      name: data.input.name,
-      description: data.input.description,
-      websiteUrl: data.input.websiteUrl,
-    };
-
-    db.blogs[index] = updatedBlog;
+    if (!newBlog) {
+      return {
+        success: false,
+        message: `Blog with id ${data.id} not found`,
+      };
+    }
 
     return {
       success: true,
       message: `Blog with id ${data.id} successfully updated`,
-      data: updatedBlog,
+      data: newBlog,
     };
   },
 
-  deleteBlog: (id: string): OperationResult => {
-    const index = db.blogs.findIndex((b) => b.id === id);
+  deleteBlog: async (id: string): Promise<OperationResult> => {
+    const deleteResult = await blogsCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
-    if (index === -1) {
+    if (deleteResult.deletedCount < 1) {
       return {
         success: false,
         message: `Blog with id ${id} not found`,
       };
     }
 
-    db.blogs.splice(index, 1);
     return {
       success: true,
       message: `Blog with id ${id} successfully deleted`,

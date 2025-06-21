@@ -1,10 +1,18 @@
 import { Request, Response } from 'express';
-import { VideoListOutput } from '../../dto/video-list.output';
 import { videosRepository } from '../../repositories/videos-repository';
+import { HttpStatus } from '../../../core/types/http-statuses';
+import { VideoViewModel } from '../../types/video-view-model';
+import { mapToVideoViewModel } from '../mappers/map-to-driver-view-model.util';
+import { ValidationErrorDto } from '../../../core/types/validationError.dto';
 
-export const getAllVideosHandler = (
+export const getAllVideosHandler = async (
   req: Request,
-  res: Response<VideoListOutput>,
+  res: Response<VideoViewModel[] | ValidationErrorDto>,
 ) => {
-  res.status(200).send(videosRepository.getAllVideos());
+  try {
+    const videos = await videosRepository.getAllVideos();
+    res.status(HttpStatus.Ok).send(videos.map(mapToVideoViewModel));
+  } catch {
+    res.status(HttpStatus.InternalServerError).send();
+  }
 };

@@ -11,7 +11,6 @@ interface Database {
 export const db: Database = {
   videos: [
     {
-      id: 1,
       title: 'Getting Started with TypeScript',
       author: 'John Smith',
       canBeDownloaded: true,
@@ -21,7 +20,6 @@ export const db: Database = {
       availableResolutions: ['P144'],
     },
     {
-      id: 2,
       title: 'Advanced JavaScript Patterns',
       author: 'Emma Wilson',
       canBeDownloaded: false,
@@ -31,7 +29,6 @@ export const db: Database = {
       availableResolutions: ['P240', 'P240'],
     },
     {
-      id: 3,
       title: 'Web Development Best Practices',
       author: 'Michael Chen',
       canBeDownloaded: true,
@@ -43,19 +40,16 @@ export const db: Database = {
   ],
   blogs: [
     {
-      id: '1',
       name: 'Technology Insights',
       description: 'Latest news and insights about technology trends',
       websiteUrl: 'https://tech-insights.example.com',
     },
     {
-      id: '2',
       name: 'Web Development Blog',
       description: 'Tips and tricks for modern web development',
       websiteUrl: 'https://webdev-blog.example.com',
     },
     {
-      id: '3',
       name: 'Programming Fundamentals',
       description: 'Back to basics with programming concepts and practices',
       websiteUrl: 'https://programming-fundamentals.example.com',
@@ -63,7 +57,6 @@ export const db: Database = {
   ],
   posts: [
     {
-      id: '1',
       title: 'Introduction to TypeScript',
       shortDescription: 'Learn the basics of TypeScript and its benefits',
       content:
@@ -72,7 +65,6 @@ export const db: Database = {
       blogName: 'Technology Insights',
     },
     {
-      id: '2',
       title: 'Modern CSS Techniques',
       shortDescription: 'Exploring the latest CSS features and methodologies',
       content:
@@ -81,7 +73,6 @@ export const db: Database = {
       blogName: 'Web Development Blog',
     },
     {
-      id: '3',
       title: 'Understanding Recursion',
       shortDescription:
         'A deep dive into recursive functions and their applications',
@@ -91,7 +82,6 @@ export const db: Database = {
       blogName: 'Programming Fundamentals',
     },
     {
-      id: '4',
       title: 'API Design Best Practices',
       shortDescription: 'Guidelines for creating robust and user-friendly APIs',
       content:

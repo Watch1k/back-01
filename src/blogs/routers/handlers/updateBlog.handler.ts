@@ -3,11 +3,11 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 import { BlogUpdateInput } from '../../dto/blog-update.input';
 import { blogsRepository } from '../../repositories/blogs-repository';
 
-export const updateBlogHandler = (
+export const updateBlogHandler = async (
   req: Request<{ id: string }, {}, BlogUpdateInput>,
   res: Response,
 ) => {
-  const result = blogsRepository.updateBlog({
+  const result = await blogsRepository.updateBlog({
     id: req.params.id,
     input: req.body,
   });

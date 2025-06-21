@@ -20,7 +20,6 @@ export const VideoResolution = {
 export type VideoResolution = EnumType<typeof VideoResolution>;
 
 export type Video = {
-  id: number;
   title: string;
   author: string;
   canBeDownloaded: boolean;

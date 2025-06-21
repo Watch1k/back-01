@@ -3,25 +3,31 @@ import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 import { VideoUpdateInput } from '../../dto/video-update.input';
 import { videosRepository } from '../../repositories/videos-repository';
+import { VideoViewModel } from '../../types/video-view-model';
+import { ValidationErrorDto } from '../../../core/types/validationError.dto';
 
-export const updateVideoHandler = (
+export const updateVideoHandler = async (
   req: Request<{ id: string }, {}, VideoUpdateInput>,
-  res: Response,
+  res: Response<VideoViewModel | ValidationErrorDto>,
 ) => {
-  const id = parseInt(req.params.id);
-  const updateResult = videosRepository.updateVideo({
-    id,
-    input: req.body,
-  });
+  try {
+    const id = req.params.id;
+    const updateResult = await videosRepository.updateVideo({
+      id,
+      input: req.body,
+    });
 
-  if (!updateResult.success) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(
-        createErrorMessages([{ field: 'id', message: updateResult.message }]),
-      );
-    return;
+    if (!updateResult.success) {
+      res
+        .status(HttpStatus.NotFound)
+        .send(
+          createErrorMessages([{ field: 'id', message: updateResult.message }]),
+        );
+      return;
+    }
+
+    res.status(HttpStatus.NoContent).send();
+  } catch {
+    res.status(HttpStatus.InternalServerError).send();
   }
-
-  res.sendStatus(HttpStatus.NoContent);
 };

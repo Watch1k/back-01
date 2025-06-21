@@ -2,11 +2,22 @@ import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { VideoCreateInput } from '../../dto/video-create.input';
 import { videosRepository } from '../../repositories/videos-repository';
+import { VideoViewModel } from '../../types/video-view-model';
+import { mapToVideoViewModel } from '../mappers/map-to-driver-view-model.util';
+import { ValidationErrorDto } from '../../../core/types/validationError.dto';
 
-export const createVideoHandler = (
+export const createVideoHandler = async (
   req: Request<{}, {}, VideoCreateInput>,
-  res: Response,
+  res: Response<VideoViewModel | ValidationErrorDto>,
 ) => {
-  const newVideo = videosRepository.createVideo(req.body);
-  res.status(HttpStatus.Created).send(newVideo);
+  try {
+    const resp = await videosRepository.createVideo(req.body);
+    if (!resp.data) {
+      res.status(HttpStatus.InternalServerError).send();
+      return;
+    }
+    res.status(HttpStatus.Created).send(mapToVideoViewModel(resp.data));
+  } catch (error) {
+    res.status(HttpStatus.InternalServerError).send();
+  }
 };

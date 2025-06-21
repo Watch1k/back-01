@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { postsRepository } from '../../repositories/posts-repository';
 
-export const getPostByIdHandler = (
+export const getPostByIdHandler = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
-  const post = postsRepository.findPost(req.params.id);
+  const post = await postsRepository.findPost(req.params.id);
 
   if (!post) {
     res.sendStatus(HttpStatus.NotFound);
