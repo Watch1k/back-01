@@ -8,6 +8,12 @@ const bootstrap = async () => {
   setupApp(app);
   const PORT = SETTINGS.PORT;
 
+  if (!SETTINGS.MONGO_URL) {
+    throw new Error(
+      'MONGO_URL is not defined. Please define it in the .env file',
+    );
+  }
+
   await runDB(SETTINGS.MONGO_URL);
 
   app.listen(PORT, () => {
