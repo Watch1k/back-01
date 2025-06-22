@@ -72,7 +72,7 @@ export const videosRepository = {
     }
 
     const newVideo = await videoCollection.findOne({
-      id: data.id,
+      _id: new ObjectId(data.id),
     });
 
     if (!newVideo) {
@@ -91,7 +91,7 @@ export const videosRepository = {
 
   deleteVideo: async (id: string): Promise<OperationResult> => {
     const deleteResult = await videoCollection.deleteOne({
-      id: id,
+      _id: new ObjectId(id),
     });
 
     if (deleteResult.deletedCount < 1) {

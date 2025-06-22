@@ -6,10 +6,24 @@ import { VideoResolution } from '../../../src/videos/types/video';
 import { VideoCreateInput } from '../../../src/videos/dto/video-create.input';
 import { VideoUpdateInput } from '../../../src/videos/dto/video-update.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
+import { startDb } from '../../utils/start-db';
+import { clearDb } from '../../utils/clear-db';
+import { stopDb } from '../../../src/db/mongo.db';
+import { ObjectId } from 'mongodb';
 
 describe('Video API', () => {
   const app = express();
   setupApp(app);
+
+  beforeAll(async () => {
+    await startDb();
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
+  });
 
   const testVideoData: VideoCreateInput = {
     title: 'Test Video',
@@ -183,7 +197,7 @@ describe('Video API', () => {
   });
 
   it('should return 404 when getting a non-existent video', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(999999);
     const response = await request(app)
       .get(`/api/videos/${nonExistentId}`)
       .expect(HttpStatus.NotFound);
@@ -193,7 +207,7 @@ describe('Video API', () => {
   });
 
   it('should return 404 when updating a non-existent video', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(999999);
     const updateData: VideoUpdateInput = {
       title: 'Updated Title',
       author: 'Updated Author',
@@ -212,7 +226,7 @@ describe('Video API', () => {
   });
 
   it('should return 404 when deleting a non-existent video', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(999999);
     const response = await authRequest(
       'delete',
       `/api/videos/${nonExistentId}`,

@@ -7,7 +7,8 @@ import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { clearDb } from '../../utils/clear-db';
-import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { stopDb } from '../../../src/db/mongo.db';
+import { startDb } from '../../utils/start-db';
 
 describe('Post API body validation check', () => {
   const app = express();
@@ -16,7 +17,7 @@ describe('Post API body validation check', () => {
   let blogId: string;
 
   beforeAll(async () => {
-    await runDB('mongodb://localhost:27017/youtube');
+    await startDb();
     await clearDb(app);
   });
 
@@ -360,7 +361,6 @@ describe('Post API body validation check', () => {
       .expect(HttpStatus.BadRequest);
 
     expect(invalidBlogIdResponse.body.errorsMessages).toBeDefined();
-    console.log(invalidBlogIdResponse.body);
     expect(
       invalidBlogIdResponse.body.errorsMessages.some(
         (e: ValidationError) => e.field === 'blogId',

@@ -25,6 +25,7 @@ export const blogsRepository = {
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
+      isMembership: false,
       createdAt: new Date().toISOString(),
     };
 

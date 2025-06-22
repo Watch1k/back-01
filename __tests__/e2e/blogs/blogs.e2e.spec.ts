@@ -5,10 +5,11 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { BlogUpdateInput } from '../../../src/blogs/dto/blog-update.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
-import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { stopDb } from '../../../src/db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { clearDb } from '../../utils/clear-db';
 import { PostInput } from '../../../src/posts/dto/post.input';
+import { startDb } from '../../utils/start-db';
 
 describe('Blog API', () => {
   const app = express();
@@ -31,7 +32,7 @@ describe('Blog API', () => {
   };
 
   beforeAll(async () => {
-    await runDB('mongodb://localhost:27017/youtube');
+    await startDb();
     await clearDb(app);
   });
 
@@ -125,6 +126,7 @@ describe('Blog API', () => {
     expect(blogResponse.body).toEqual({
       ...blogUpdateData,
       id: createResponse.body.id,
+      isMembership: false,
       createdAt: createResponse.body.createdAt,
     });
   });

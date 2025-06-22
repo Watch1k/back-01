@@ -5,21 +5,16 @@ import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
-import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { stopDb } from '../../../src/db/mongo.db';
 import { clearDb } from '../../utils/clear-db';
+import { startDb } from '../../utils/start-db';
 
 describe('Blog API body validation check', () => {
   const app = express();
   setupApp(app);
 
-  const correctBlogData: BlogCreateInput = {
-    name: 'Test Blog',
-    description: 'Test Description',
-    websiteUrl: 'https://test-blog.com',
-  };
-
   beforeAll(async () => {
-    await runDB('mongodb://localhost:27017/youtube');
+    await startDb();
     await clearDb(app);
   });
 
@@ -27,6 +22,12 @@ describe('Blog API body validation check', () => {
     await clearDb(app);
     await stopDb();
   });
+
+  const correctBlogData: BlogCreateInput = {
+    name: 'Test Blog',
+    description: 'Test Description',
+    websiteUrl: 'https://test-blog.com',
+  };
 
   const authHeader = generateBasicAuthToken();
 

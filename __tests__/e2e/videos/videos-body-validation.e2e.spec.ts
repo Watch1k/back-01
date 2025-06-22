@@ -6,10 +6,23 @@ import { VideoResolution } from '../../../src/videos/types/video';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
+import { startDb } from '../../utils/start-db';
+import { clearDb } from '../../utils/clear-db';
+import { stopDb } from '../../../src/db/mongo.db';
 
 describe('Video API body validation check', () => {
   const app = express();
   setupApp(app);
+
+  beforeAll(async () => {
+    await startDb();
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
+  });
 
   const correctVideoData: VideoCreateInput = {
     title: 'Test Video',

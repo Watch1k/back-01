@@ -8,4 +8,5 @@ export const mapToBlogModel = (blog: WithId<Blog>): BlogViewModel => ({
   description: blog.description,
   websiteUrl: blog.websiteUrl,
   createdAt: blog.createdAt,
+  isMembership: blog.isMembership,
 });
