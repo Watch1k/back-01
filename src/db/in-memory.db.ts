@@ -43,16 +43,19 @@ export const db: Database = {
       name: 'Technology Insights',
       description: 'Latest news and insights about technology trends',
       websiteUrl: 'https://tech-insights.example.com',
+      createdAt: '2024-03-15T10:00:00.000Z',
     },
     {
       name: 'Web Development Blog',
       description: 'Tips and tricks for modern web development',
       websiteUrl: 'https://webdev-blog.example.com',
+      createdAt: '2024-03-14T15:30:00.000Z',
     },
     {
       name: 'Programming Fundamentals',
       description: 'Back to basics with programming concepts and practices',
       websiteUrl: 'https://programming-fundamentals.example.com',
+      createdAt: '2024-03-13T09:45:00.000Z',
     },
   ],
   posts: [

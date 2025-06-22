@@ -5,12 +5,26 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { PostInput } from '../../../src/posts/dto/post.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
+import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { clearDb } from '../../utils/clear-db';
 
 describe('Post API', () => {
   const app = express();
   setupApp(app);
 
+  const adminToken = generateBasicAuthToken();
+
   let blogId: string;
+
+  beforeAll(async () => {
+    await runDB('mongodb://localhost:27017/youtube');
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
+  });
 
   // Test blog data to create a blog for posts
   const testBlogData: BlogCreateInput = {
@@ -31,9 +45,7 @@ describe('Post API', () => {
     method: 'get' | 'post' | 'put' | 'delete',
     path: string,
   ) => {
-    return request(app)
-      [method](path)
-      .set('Authorization', generateBasicAuthToken());
+    return request(app)[method](path).set('Authorization', adminToken);
   };
 
   beforeAll(async () => {
@@ -58,6 +70,7 @@ describe('Post API', () => {
     };
 
     const response = await authRequest('post', '/api/posts').send(newPost);
+    console.log(response.body);
     expect(response.status).toBe(HttpStatus.Created);
     expect(response.body.title).toBe(newPost.title);
     expect(response.body.shortDescription).toBe(newPost.shortDescription);

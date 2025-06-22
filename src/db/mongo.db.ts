@@ -32,3 +32,10 @@ export async function runDB(url: string): Promise<void> {
     throw new Error(`❌ Database not connected: ${e}`);
   }
 }
+
+export async function stopDb() {
+  if (!client) {
+    throw new Error(`❌ No active client`);
+  }
+  await client.close();
+}

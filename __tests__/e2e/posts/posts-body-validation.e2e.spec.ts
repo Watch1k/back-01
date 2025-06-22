@@ -6,12 +6,25 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { ValidationError } from '../../../src/core/types/validationError';
+import { clearDb } from '../../utils/clear-db';
+import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { ObjectId } from 'mongodb';
 
 describe('Post API body validation check', () => {
   const app = express();
   setupApp(app);
 
   let blogId: string;
+
+  beforeAll(async () => {
+    await runDB('mongodb://localhost:27017/youtube');
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
+  });
 
   // Test blog data to create a blog for posts
   const testBlogData: BlogCreateInput = {
@@ -266,7 +279,7 @@ describe('Post API body validation check', () => {
   });
 
   it('should not update post when update data is invalid', async () => {
-    // First create a valid post
+    // First, create a valid post
     const createResponse = await request(app)
       .post('/api/posts')
       .set('Authorization', authHeader)
@@ -316,7 +329,7 @@ describe('Post API body validation check', () => {
       ),
     ).toBe(true);
 
-    // Test invalid content
+    // // Test invalid content
     const invalidContentResponse = await request(app)
       .put(`/api/posts/${postId}`)
       .set('Authorization', authHeader)
@@ -348,6 +361,7 @@ describe('Post API body validation check', () => {
       .expect(HttpStatus.BadRequest);
 
     expect(invalidBlogIdResponse.body.errorsMessages).toBeDefined();
+    console.log(invalidBlogIdResponse.body);
     expect(
       invalidBlogIdResponse.body.errorsMessages.some(
         (e: ValidationError) => e.field === 'blogId',

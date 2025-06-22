@@ -5,10 +5,16 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { BlogUpdateInput } from '../../../src/blogs/dto/blog-update.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
+import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { ObjectId } from 'mongodb';
+import { clearDb } from '../../utils/clear-db';
+import { PostInput } from '../../../src/posts/dto/post.input';
 
 describe('Blog API', () => {
   const app = express();
   setupApp(app);
+
+  const adminToken = generateBasicAuthToken();
 
   const testBlogData: BlogCreateInput = {
     name: 'Test Blog',
@@ -21,15 +27,17 @@ describe('Blog API', () => {
     method: 'get' | 'post' | 'put' | 'delete',
     path: string,
   ) => {
-    return request(app)
-      [method](path)
-      .set('Authorization', generateBasicAuthToken());
+    return request(app)[method](path).set('Authorization', adminToken);
   };
 
   beforeAll(async () => {
-    await authRequest('delete', '/api/testing/all-data').expect(
-      HttpStatus.NoContent,
-    );
+    await runDB('mongodb://localhost:27017/youtube');
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
   });
 
   it('should create blog; POST /api/blogs', async () => {
@@ -183,7 +191,7 @@ describe('Blog API', () => {
   });
 
   it('should return 404 when getting a non-existent blog', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(1234567890);
     const response = await request(app).get(`/api/blogs/${nonExistentId}`);
     expect(response.status).toBe(HttpStatus.NotFound);
 
@@ -193,7 +201,7 @@ describe('Blog API', () => {
   });
 
   it('should return 404 when updating a non-existent blog', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(1234567890);
     const updateData: BlogUpdateInput = {
       name: 'Updated Name',
       description: 'Updated Description',
@@ -212,12 +220,85 @@ describe('Blog API', () => {
   });
 
   it('should return 404 when deleting a non-existent blog', async () => {
-    const nonExistentId = 999999;
+    const nonExistentId = ObjectId.createFromTime(1234567890);
     const response = await authRequest('delete', `/api/blogs/${nonExistentId}`);
     expect(response.status).toBe(HttpStatus.NotFound);
 
     // Check if the response has an error message
     // Note: The format might be different from what we expected
     expect(response.body).toBeDefined();
+  });
+
+  it('should delete a blog and all its related posts', async () => {
+    // Create a blog
+    const newBlog: BlogCreateInput = {
+      ...testBlogData,
+      name: 'Blog to Delete',
+    };
+    const createBlogResponse = await authRequest('post', '/api/blogs').send(
+      newBlog,
+    );
+    expect(createBlogResponse.status).toBe(HttpStatus.Created);
+    const blogId = createBlogResponse.body.id;
+
+    // Create posts for this blog
+    const testPostData = {
+      title: 'Test Post for Blog Deletion',
+      shortDescription: 'This post should be deleted when the blog is deleted',
+      content: 'Test content',
+    };
+
+    // Create multiple posts for the blog
+    const post1: PostInput = {
+      ...testPostData,
+      title: 'Post 1 for Blog Deletion',
+      blogId,
+    };
+    const post2: PostInput = {
+      ...testPostData,
+      title: 'Post 2 for Blog Deletion',
+      blogId,
+    };
+
+    const createPost1Response = await authRequest('post', '/api/posts').send(
+      post1,
+    );
+    expect(createPost1Response.status).toBe(HttpStatus.Created);
+    const post1Id = createPost1Response.body.id;
+
+    const createPost2Response = await authRequest('post', '/api/posts').send(
+      post2,
+    );
+    expect(createPost2Response.status).toBe(HttpStatus.Created);
+    const post2Id = createPost2Response.body.id;
+
+    // Verify posts exist
+    const getPost1Response = await request(app).get(`/api/posts/${post1Id}`);
+    expect(getPost1Response.status).toBe(HttpStatus.Ok);
+
+    const getPost2Response = await request(app).get(`/api/posts/${post2Id}`);
+    expect(getPost2Response.status).toBe(HttpStatus.Ok);
+
+    // Delete the blog
+    const deleteBlogResponse = await authRequest(
+      'delete',
+      `/api/blogs/${blogId}`,
+    );
+    expect(deleteBlogResponse.status).toBe(HttpStatus.NoContent);
+
+    // Verify blog is deleted
+    const getBlogResponse = await request(app).get(`/api/blogs/${blogId}`);
+    expect(getBlogResponse.status).toBe(HttpStatus.NotFound);
+
+    // Verify posts are also deleted
+    const getPost1AfterDeleteResponse = await request(app).get(
+      `/api/posts/${post1Id}`,
+    );
+    expect(getPost1AfterDeleteResponse.status).toBe(HttpStatus.NotFound);
+
+    const getPost2AfterDeleteResponse = await request(app).get(
+      `/api/posts/${post2Id}`,
+    );
+    expect(getPost2AfterDeleteResponse.status).toBe(HttpStatus.NotFound);
   });
 });

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { blogsRepository } from '../../repositories/blogs-repository';
 import { createErrorMessages } from '../../../core/utils/error.utils';
+import { mapToBlogModel } from '../mappers/map-to-blog-view-model.util';
 
 export const getBlogByIdHandler = async (req: Request, res: Response) => {
   const id = req.params.id;
@@ -19,5 +20,5 @@ export const getBlogByIdHandler = async (req: Request, res: Response) => {
     return;
   }
 
-  res.status(HttpStatus.Ok).send(blog);
+  res.status(HttpStatus.Ok).send(mapToBlogModel(blog));
 };

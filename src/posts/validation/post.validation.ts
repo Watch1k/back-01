@@ -3,45 +3,36 @@ import { blogsRepository } from '../../blogs/repositories/blogs-repository';
 
 const titleValidation = body('title')
   .exists()
-  .withMessage('Invalid title. Max length is 30 characters.')
   .isString()
-  .withMessage('Invalid title. Max length is 30 characters.')
   .isLength({ max: 30 })
-  .withMessage('Invalid title. Max length is 30 characters.')
-  .withMessage('Invalid title. Max length is 30 characters.')
   .trim()
-  .notEmpty();
+  .notEmpty()
+  .withMessage('Invalid title. Max length is 30 characters.');
 
 const shortDescriptionValidation = body('shortDescription')
   .exists()
-  .withMessage('Invalid shortDescription. Max length is 100 characters.')
   .isString()
-  .withMessage('Invalid shortDescription. Max length is 100 characters.')
   .isLength({ max: 100 })
-  .withMessage('Invalid shortDescription. Max length is 100 characters.')
   .trim()
   .notEmpty()
   .withMessage('Invalid shortDescription. Max length is 100 characters.');
 
 const contentValidation = body('content')
   .exists()
-  .withMessage('Invalid content. Max length is 1000 characters.')
   .isString()
-  .withMessage('Invalid content. Max length is 1000 characters.')
   .isLength({ max: 1000 })
-  .withMessage('Invalid content. Max length is 1000 characters.')
   .trim()
   .notEmpty()
   .withMessage('Invalid content. Max length is 1000 characters.');
 
 const blogIdValidation = body('blogId')
   .exists()
-  .withMessage('Invalid blogId.')
   .isString()
-  .withMessage('Invalid blogId.')
   .trim()
   .notEmpty()
+  .isMongoId()
   .withMessage('Invalid blogId.')
+  .bail()
   .custom((value) => {
     const blog = blogsRepository.findBlog(value);
     if (!blog) {

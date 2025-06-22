@@ -3,22 +3,16 @@ import { VideoResolution } from '../types/video';
 
 const titleValidation = body('title')
   .exists()
-  .withMessage('Invalid title. Max length is 40 characters.')
   .isString()
-  .withMessage('Invalid title. Max length is 40 characters.')
   .isLength({ max: 40 })
-  .withMessage('Invalid title. Max length is 40 characters.')
   .trim()
   .notEmpty()
   .withMessage('Invalid title. Max length is 40 characters.');
 
 const authorValidation = body('author')
   .exists()
-  .withMessage('Invalid author. Max length is 20 characters.')
   .isString()
-  .withMessage('Invalid author. Max length is 20 characters.')
   .isLength({ max: 20 })
-  .withMessage('Invalid author. Max length is 20 characters.')
   .trim()
   .notEmpty()
   .withMessage('Invalid author. Max length is 20 characters.');

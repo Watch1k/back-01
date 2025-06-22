@@ -17,7 +17,7 @@ export const createVideoHandler = async (
       return;
     }
     res.status(HttpStatus.Created).send(mapToVideoViewModel(resp.data));
-  } catch (error) {
+  } catch {
     res.status(HttpStatus.InternalServerError).send();
   }
 };

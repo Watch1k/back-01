@@ -5,6 +5,8 @@ import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
+import { runDB, stopDb } from '../../../src/db/mongo.db';
+import { clearDb } from '../../utils/clear-db';
 
 describe('Blog API body validation check', () => {
   const app = express();
@@ -17,9 +19,13 @@ describe('Blog API body validation check', () => {
   };
 
   beforeAll(async () => {
-    await request(app)
-      .delete('/api/testing/all-data')
-      .expect(HttpStatus.NoContent);
+    await runDB('mongodb://localhost:27017/youtube');
+    await clearDb(app);
+  });
+
+  afterAll(async () => {
+    await clearDb(app);
+    await stopDb();
   });
 
   const authHeader = generateBasicAuthToken();
@@ -252,7 +258,7 @@ describe('Blog API body validation check', () => {
   });
 
   it('should not update blog when update data is invalid', async () => {
-    // First create a valid blog
+    // First, create a valid blog
     const createResponse = await request(app)
       .post('/api/blogs')
       .set('Authorization', authHeader)

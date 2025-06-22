@@ -1,7 +1,7 @@
 import { BlogCreateInput } from '../dto/blog-create.input';
 import { Blog } from '../types/blog';
 import { BlogUpdateInput } from '../dto/blog-update.input';
-import { blogsCollection } from '../../db/mongo.db';
+import { blogsCollection, postsCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
 
 type OperationResult<T = void> = {
@@ -25,6 +25,7 @@ export const blogsRepository = {
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
+      createdAt: new Date().toISOString(),
     };
 
     const resp = await blogsCollection.insertOne(newBlog);
@@ -81,6 +82,24 @@ export const blogsRepository = {
   },
 
   deleteBlog: async (id: string): Promise<OperationResult> => {
+    // First, check if the blog exists
+    const blog = await blogsCollection.findOne({
+      _id: new ObjectId(id),
+    });
+
+    if (!blog) {
+      return {
+        success: false,
+        message: `Blog with id ${id} not found`,
+      };
+    }
+
+    // Delete all posts related to this blog
+    await postsCollection.deleteMany({
+      blogId: id,
+    });
+
+    // Delete the blog
     const deleteResult = await blogsCollection.deleteOne({
       _id: new ObjectId(id),
     });
@@ -94,7 +113,7 @@ export const blogsRepository = {
 
     return {
       success: true,
-      message: `Blog with id ${id} successfully deleted`,
+      message: `Blog with id ${id} and all related posts successfully deleted`,
     };
   },
 };
