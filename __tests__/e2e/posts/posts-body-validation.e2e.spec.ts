@@ -8,7 +8,6 @@ import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { clearDb } from '../../utils/clear-db';
 import { runDB, stopDb } from '../../../src/db/mongo.db';
-import { ObjectId } from 'mongodb';
 
 describe('Post API body validation check', () => {
   const app = express();
