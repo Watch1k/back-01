@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 import { VideoUpdateInput } from '../../dto/video-update.input';
-import { videosRepository } from '../../repositories/videos-repository';
 import { VideoViewModel } from '../../types/video-view-model';
 import { ValidationErrorDto } from '../../../core/types/validationError.dto';
+import { videosService } from '../../domain/videos-service';
 
 export const updateVideoHandler = async (
   req: Request<{ id: string }, {}, VideoUpdateInput>,
@@ -12,7 +12,7 @@ export const updateVideoHandler = async (
 ) => {
   try {
     const id = req.params.id;
-    const updateResult = await videosRepository.updateVideo({
+    const updateResult = await videosService.updateVideo({
       id,
       input: req.body,
     });

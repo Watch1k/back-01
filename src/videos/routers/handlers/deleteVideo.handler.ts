@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
-import { videosRepository } from '../../repositories/videos-repository';
 import { ValidationErrorDto } from '../../../core/types/validationError.dto';
+import { videosService } from '../../domain/videos-service';
 
 export const deleteVideoHandler = async (
   req: Request,
@@ -10,7 +10,7 @@ export const deleteVideoHandler = async (
 ) => {
   try {
     const id = req.params.id;
-    const deleteResult = await videosRepository.deleteVideo(id);
+    const deleteResult = await videosService.deleteVideo(id);
 
     if (!deleteResult.success) {
       res

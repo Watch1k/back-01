@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
-import { videosRepository } from '../../repositories/videos-repository';
 import { mapToVideoViewModel } from '../mappers/map-to-driver-view-model.util';
 import { VideoViewModel } from '../../types/video-view-model';
 import { ValidationErrorDto } from '../../../core/types/validationError.dto';
+import { videosService } from '../../domain/videos-service';
 
 export const getVideoByIdHandler = async (
   req: Request,
@@ -12,7 +12,7 @@ export const getVideoByIdHandler = async (
 ) => {
   try {
     const id = req.params.id;
-    const video = await videosRepository.findVideo(id);
+    const video = await videosService.findVideo(id);
 
     if (!video) {
       res

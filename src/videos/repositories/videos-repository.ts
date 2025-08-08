@@ -19,26 +19,14 @@ export const videosRepository = {
     }),
 
   createVideo: async (
-    video: VideoCreateInput,
+    video: Video,
   ): Promise<OperationResult<WithId<Video>>> => {
-    const newVideo: Video = {
-      title: video.title,
-      author: video.author,
-      availableResolutions: video.availableResolutions,
-      minAgeRestriction: null,
-      publicationDate: new Date(
-        new Date().getTime() + 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      canBeDownloaded: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    const resp = await videoCollection.insertOne(newVideo);
+    const resp = await videoCollection.insertOne(video);
 
     return {
       success: true,
       message: `Video with id ${resp.insertedId} successfully created`,
-      data: { ...newVideo, _id: resp.insertedId },
+      data: { ...video, _id: resp.insertedId },
     };
   },
 
