@@ -13,6 +13,7 @@ import {
   updateBlogValidation,
 } from '../validation/blog.validation';
 import { adminGuardMiddleware } from '../../auth/middlewares/admin.guard-middleware';
+import { getPostsByBlogIdHandler } from './handlers/getPostsByBlogId.handler';
 
 export const blogsRouter = Router({});
 
@@ -45,4 +46,17 @@ blogsRouter
     idValidation,
     inputValidationResultMiddleware,
     deleteBlogHandler,
+  )
+  .get(
+    '/:id/posts',
+    idValidation,
+    inputValidationResultMiddleware,
+    getPostsByBlogIdHandler,
+  )
+  .post(
+    '/:id/posts',
+    adminGuardMiddleware,
+    createBlogValidation,
+    inputValidationResultMiddleware,
+    createBlogHandler,
   );
