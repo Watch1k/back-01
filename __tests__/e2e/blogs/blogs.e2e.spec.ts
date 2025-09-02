@@ -8,8 +8,8 @@ import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { stopDb } from '../../../src/db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { clearDb } from '../../utils/clear-db';
-import { PostInput } from '../../../src/posts/dto/post.input';
 import { startDb } from '../../utils/start-db';
+import { PostCreateInput } from '../../../src/posts/routers/input/post-create.input';
 
 describe('Blog API', () => {
   const app = express();
@@ -251,12 +251,12 @@ describe('Blog API', () => {
     };
 
     // Create multiple posts for the blog
-    const post1: PostInput = {
+    const post1: PostCreateInput = {
       ...testPostData,
       title: 'Post 1 for Blog Deletion',
       blogId,
     };
-    const post2: PostInput = {
+    const post2: HttpStatus = {
       ...testPostData,
       title: 'Post 2 for Blog Deletion',
       blogId,

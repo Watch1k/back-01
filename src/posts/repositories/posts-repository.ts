@@ -1,121 +1,105 @@
-import { PostCreateInput } from '../dto/post-create.input';
-import { Post } from '../types/post';
-import { PostUpdateInput } from '../dto/post-update.input';
-import { blogsRepository } from '../../blogs/repositories/blogs-repository';
+import { Post } from '../domain/post';
 import { postsCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
-
-type OperationResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
+import { PostAttributes } from '../application/dtos/post-attributes';
+import { OperationResult } from '../../core/types/operation-result';
+import { PostQueryInput } from '../routes/input/post-query.input';
+import { RepositoryNotFoundError } from '../../core/errors/repository-not-found.error';
 
 export const postsRepository = {
-  getAllPosts: () => postsCollection.find().toArray(),
+  getAllPosts: async (query: PostQueryInput) => {
+    const { pageNumber, pageSize, sortBy, sortDirection } = query;
+
+    const skip = (pageNumber - 1) * pageSize;
+
+    const items = await postsCollection
+      .find()
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    const totalCount = await postsCollection.countDocuments();
+
+    return { items, totalCount };
+  },
 
   findPost: async (id: string) =>
     await postsCollection.findOne({
       _id: new ObjectId(id),
     }),
 
-  createPost: async (
-    post: PostCreateInput,
-  ): Promise<OperationResult<WithId<Post>>> => {
-    const blog = await blogsRepository.findBlog(post.blogId);
+  async findByIdOrFail(id: string): Promise<WithId<Post>> {
+    const res = await postsCollection.findOne({ _id: new ObjectId(id) });
 
-    if (!blog) {
-      throw new Error(`Blog with id ${post.blogId} not found`);
+    if (!res) {
+      throw new RepositoryNotFoundError('Driver not exist');
     }
+    return res;
+  },
 
-    const newPost: Post = {
-      title: post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: post.blogId,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-    };
+  async findPostsByBlogId(
+    query: PostQueryInput,
+    blogId: string,
+  ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = query;
+    const filter = { blogId };
+    const skip = (pageNumber - 1) * pageSize;
 
-    const resp = await postsCollection.insertOne(newPost);
+    await postsCollection
+      .find(filter)
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+    const [items, totalCount] = await Promise.all([
+      postsCollection
+        .find(filter)
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+      postsCollection.countDocuments(filter),
+    ]);
 
-    return {
-      success: true,
-      message: `Post with id ${resp.insertedId} successfully created`,
-      data: { ...newPost, _id: resp.insertedId },
-    };
+    return { items, totalCount };
+  },
+
+  createPost: async (post: Post): Promise<string> => {
+    const resp = await postsCollection.insertOne(post);
+
+    return resp.insertedId.toString();
   },
 
   updatePost: async (data: {
     id: string;
-    input: PostUpdateInput;
-  }): Promise<OperationResult<WithId<Post>>> => {
-    const blog = await blogsRepository.findBlog(data.input.blogId);
-
-    if (!blog) {
-      return {
-        success: false,
-        message: `Blog with id ${data.input.blogId} not found`,
-      };
-    }
-
-    const updatedPost = {
-      title: data.input.title,
-      shortDescription: data.input.shortDescription,
-      content: data.input.content,
-      blogId: data.input.blogId,
-      blogName: blog.name,
-    };
-
+    input: PostAttributes;
+  }): Promise<void> => {
     const updateResult = await postsCollection.updateOne(
       {
         _id: new ObjectId(data.id),
       },
       {
-        $set: updatedPost,
+        $set: data.input,
       },
     );
 
     if (updateResult.matchedCount < 1) {
-      return {
-        success: false,
-        message: `Post with id ${data.id} not found`,
-      };
+      throw new RepositoryNotFoundError('Post not exist');
     }
 
-    const newPost = await postsCollection.findOne({
-      _id: new ObjectId(data.id),
-    });
-
-    if (!newPost) {
-      return {
-        success: false,
-        message: `Post with id ${data.id} not found`,
-      };
-    }
-
-    return {
-      success: true,
-      message: `Post with id ${data.id} successfully updated`,
-      data: newPost,
-    };
+    return;
   },
 
-  deletePost: async (id: string): Promise<OperationResult> => {
+  deletePost: async (id: string): Promise<void> => {
     const deleteResult = await postsCollection.deleteOne({
       _id: new ObjectId(id),
     });
 
     if (deleteResult.deletedCount < 1) {
-      return {
-        success: false,
-        message: `Post with id ${id} not found`,
-      };
+      throw new RepositoryNotFoundError('Post not exist');
     }
 
-    return {
-      success: true,
-      message: `Post with id ${id} successfully deleted`,
-    };
+    return;
   },
 };

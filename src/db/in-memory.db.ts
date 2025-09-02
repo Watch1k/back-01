@@ -1,15 +1,12 @@
-import { Video } from '../videos/types/video';
-import { Blog } from '../blogs/types/blog';
-import { Post } from '../posts/types/post';
+import { Blog } from '../blogs/domain/blog';
+import { Post } from '../posts/domain/post';
 
 interface Database {
-  videos: Video[];
   blogs: Blog[];
   posts: Post[];
 }
 
 export const db: Database = {
-  videos: [],
   blogs: [],
   posts: [],
 };

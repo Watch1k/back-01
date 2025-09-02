@@ -1,98 +1,81 @@
-import { BlogCreateInput } from '../dto/blog-create.input';
-import { Blog } from '../types/blog';
-import { BlogUpdateInput } from '../dto/blog-update.input';
 import { blogsCollection, postsCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
-
-type OperationResult<T = void> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
+import { RepositoryNotFoundError } from '../../core/errors/repository-not-found.error';
+import { Blog } from '../domain/blog';
+import { BlogAttributes } from '../application/dtos/blog-attributes';
+import { BlogQueryInput } from '../routes/input/blog-query.input';
 
 export const blogsRepository = {
-  getAllBlogs: () => blogsCollection.find().toArray(),
+  getAllBlogs: async (query: BlogQueryInput) => {
+    const { pageNumber, pageSize, sortBy, sortDirection } = query;
+
+    const skip = (pageNumber - 1) * pageSize;
+
+    const items = await blogsCollection
+      .find()
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    const totalCount = await blogsCollection.countDocuments();
+
+    return { items, totalCount };
+  },
 
   findBlog: async (id: string) =>
     await blogsCollection.findOne({
       _id: new ObjectId(id),
     }),
 
-  createBlog: async (
-    blog: BlogCreateInput,
-  ): Promise<OperationResult<WithId<Blog>>> => {
+  async findByIdOrFail(id: string): Promise<WithId<Blog>> {
+    const res = await blogsCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!res) {
+      throw new RepositoryNotFoundError('Driver not exist');
+    }
+    return res;
+  },
+
+  createBlog: async (blog: BlogAttributes): Promise<string> => {
     const newBlog: Blog = {
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
       isMembership: false,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     };
 
     const resp = await blogsCollection.insertOne(newBlog);
 
-    return {
-      success: true,
-      message: `Blog with id ${resp.insertedId} successfully created`,
-      data: { ...newBlog, _id: resp.insertedId },
-    };
+    return resp.insertedId.toString();
   },
 
-  updateBlog: async (data: {
-    id: string;
-    input: BlogUpdateInput;
-  }): Promise<OperationResult<WithId<Blog>>> => {
-    const updatedBlog = {
-      name: data.input.name,
-      description: data.input.description,
-      websiteUrl: data.input.websiteUrl,
-    };
-
+  updateBlog: async (id: string, input: BlogAttributes): Promise<void> => {
     const updateResult = await blogsCollection.updateOne(
       {
-        _id: new ObjectId(data.id),
+        _id: new ObjectId(id),
       },
       {
-        $set: updatedBlog,
+        $set: input,
       },
     );
 
     if (updateResult.matchedCount < 1) {
-      return {
-        success: false,
-        message: `Blog with id ${data.id} not found`,
-      };
+      throw new RepositoryNotFoundError('Blog not exist');
     }
 
-    const newBlog = await blogsCollection.findOne({
-      _id: new ObjectId(data.id),
-    });
-
-    if (!newBlog) {
-      return {
-        success: false,
-        message: `Blog with id ${data.id} not found`,
-      };
-    }
-
-    return {
-      success: true,
-      message: `Blog with id ${data.id} successfully updated`,
-      data: newBlog,
-    };
+    return;
   },
 
-  deleteBlog: async (id: string): Promise<OperationResult> => {
+  deleteBlog: async (id: string): Promise<void> => {
     // First, check if the blog exists
     const blog = await blogsCollection.findOne({
       _id: new ObjectId(id),
     });
 
     if (!blog) {
-      return {
-        success: false,
-        message: `Blog with id ${id} not found`,
-      };
+      throw new RepositoryNotFoundError('Blog not exist');
     }
 
     // Delete all posts related to this blog
@@ -106,15 +89,9 @@ export const blogsRepository = {
     });
 
     if (deleteResult.deletedCount < 1) {
-      return {
-        success: false,
-        message: `Blog with id ${id} not found`,
-      };
+      throw new RepositoryNotFoundError('Blog not exist');
     }
 
-    return {
-      success: true,
-      message: `Blog with id ${id} and all related posts successfully deleted`,
-    };
+    return;
   },
 };

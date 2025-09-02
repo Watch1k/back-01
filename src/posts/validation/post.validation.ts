@@ -56,3 +56,9 @@ export const updatePostValidation = [
   contentValidation,
   blogIdValidation,
 ];
+
+export const createPostByBlogIdValidation = [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
+];
