@@ -6,7 +6,7 @@ import {
   updatePostHandler,
   deletePostHandler,
 } from './handlers';
-import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validtion-result.middleware';
+import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation-middleware';
 import {
   createPostValidation,

@@ -32,7 +32,7 @@ export const blogsRepository = {
     const res = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!res) {
-      throw new RepositoryNotFoundError('Driver not exist');
+      throw new RepositoryNotFoundError('Blog not exist');
     }
     return res;
   },

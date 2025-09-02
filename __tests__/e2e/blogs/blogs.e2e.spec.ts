@@ -2,14 +2,12 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
-import { BlogUpdateInput } from '../../../src/blogs/dto/blog-update.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { stopDb } from '../../../src/db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { clearDb } from '../../utils/clear-db';
 import { startDb } from '../../utils/start-db';
-import { PostCreateInput } from '../../../src/posts/routers/input/post-create.input';
+import { BlogAttributes } from '../../../src/blogs/application/dtos/blog-attributes';
 
 describe('Blog API', () => {
   const app = express();
@@ -17,7 +15,7 @@ describe('Blog API', () => {
 
   const adminToken = generateBasicAuthToken();
 
-  const testBlogData: BlogCreateInput = {
+  const testBlogData: BlogAttributes = {
     name: 'Test Blog',
     description: 'Test Description',
     websiteUrl: 'https://test-blog.com',
@@ -42,7 +40,7 @@ describe('Blog API', () => {
   });
 
   it('should create blog; POST /api/blogs', async () => {
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'New Test Blog',
     };
@@ -52,11 +50,11 @@ describe('Blog API', () => {
   });
 
   it('should return blogs list; GET /api/blogs', async () => {
-    const newBlog1: BlogCreateInput = {
+    const newBlog1 = {
       ...testBlogData,
       name: 'Test Blog 1',
     };
-    const newBlog2: BlogCreateInput = {
+    const newBlog2 = {
       ...testBlogData,
       name: 'Test Blog 2',
     };
@@ -79,7 +77,7 @@ describe('Blog API', () => {
   });
 
   it('should return blog by id; GET /api/blogs/:id', async () => {
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'Test Blog 3',
     };
@@ -97,7 +95,7 @@ describe('Blog API', () => {
   });
 
   it('should update blog; PUT /api/blogs/:id', async () => {
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'Test Blog 4',
     };
@@ -106,7 +104,7 @@ describe('Blog API', () => {
     );
     expect(createResponse.status).toBe(HttpStatus.Created);
 
-    const blogUpdateData: BlogUpdateInput = {
+    const blogUpdateData = {
       name: 'Updated Blog',
       description: 'Updated Blog Description',
       websiteUrl: 'https://updated-blog.com',
@@ -132,7 +130,7 @@ describe('Blog API', () => {
   });
 
   it('DELETE /api/blogs/:id and check after NOT FOUND', async () => {
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'Test Blog 5',
     };
@@ -168,7 +166,7 @@ describe('Blog API', () => {
 
   it('should return 400 when updating a blog with invalid data', async () => {
     // Create a valid blog first
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'Test Blog 6',
     };
@@ -204,7 +202,7 @@ describe('Blog API', () => {
 
   it('should return 404 when updating a non-existent blog', async () => {
     const nonExistentId = ObjectId.createFromTime(1234567890);
-    const updateData: BlogUpdateInput = {
+    const updateData = {
       name: 'Updated Name',
       description: 'Updated Description',
       websiteUrl: 'https://updated-blog.com',
@@ -233,7 +231,7 @@ describe('Blog API', () => {
 
   it('should delete a blog and all its related posts', async () => {
     // Create a blog
-    const newBlog: BlogCreateInput = {
+    const newBlog = {
       ...testBlogData,
       name: 'Blog to Delete',
     };
@@ -251,12 +249,12 @@ describe('Blog API', () => {
     };
 
     // Create multiple posts for the blog
-    const post1: PostCreateInput = {
+    const post1 = {
       ...testPostData,
       title: 'Post 1 for Blog Deletion',
       blogId,
     };
-    const post2: HttpStatus = {
+    const post2 = {
       ...testPostData,
       title: 'Post 2 for Blog Deletion',
       blogId,

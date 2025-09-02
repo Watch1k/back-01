@@ -2,13 +2,13 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { PostInput } from '../../../src/posts/dto/post.input';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
-import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { stopDb } from '../../../src/db/mongo.db';
 import { clearDb } from '../../utils/clear-db';
 import { startDb } from '../../utils/start-db';
 import { ObjectId } from 'mongodb';
+import { BlogAttributes } from '../../../src/blogs/application/dtos/blog-attributes';
+import { PostAttributes } from '../../../src/posts/application/dtos/post-attributes';
 
 describe('Post API', () => {
   const app = express();
@@ -29,14 +29,14 @@ describe('Post API', () => {
   });
 
   // Test blog data to create a blog for posts
-  const testBlogData: BlogCreateInput = {
+  const testBlogData: BlogAttributes = {
     name: 'Test Blog',
     description: 'Test Description',
     websiteUrl: 'https://test-blog.com',
   };
 
   // Test post data
-  const testPostData: Omit<PostInput, 'blogId'> = {
+  const testPostData: Partial<PostAttributes> = {
     title: 'Test Post',
     shortDescription: 'Test Short Description',
     content: 'Test Content',
@@ -65,7 +65,7 @@ describe('Post API', () => {
   });
 
   it('should create post; POST /api/posts', async () => {
-    const newPost: PostInput = {
+    const newPost: Partial<PostAttributes> = {
       ...testPostData,
       title: 'New Test Post',
       blogId,
@@ -82,12 +82,12 @@ describe('Post API', () => {
   });
 
   it('should return posts list; GET /api/posts', async () => {
-    const newPost1: PostInput = {
+    const newPost1: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 1',
       blogId,
     };
-    const newPost2: PostInput = {
+    const newPost2: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 2',
       blogId,
@@ -111,7 +111,7 @@ describe('Post API', () => {
   });
 
   it('should return post by id; GET /api/posts/:id', async () => {
-    const newPost: PostInput = {
+    const newPost: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 3',
       blogId,
@@ -130,7 +130,7 @@ describe('Post API', () => {
   });
 
   it('should update post; PUT /api/posts/:id', async () => {
-    const newPost: PostInput = {
+    const newPost: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 4',
       blogId,
@@ -140,7 +140,7 @@ describe('Post API', () => {
     );
     expect(createResponse.status).toBe(HttpStatus.Created);
 
-    const postUpdateData: PostInput = {
+    const postUpdateData: Partial<PostAttributes> = {
       title: 'Updated Post',
       shortDescription: 'Updated Short Description',
       content: 'Updated Content',
@@ -165,7 +165,7 @@ describe('Post API', () => {
   });
 
   it('DELETE /api/posts/:id and check after NOT FOUND', async () => {
-    const newPost: PostInput = {
+    const newPost: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 5',
       blogId,
@@ -202,7 +202,7 @@ describe('Post API', () => {
 
   it('should return 400 when updating a post with invalid data', async () => {
     // Create a valid post first
-    const newPost: PostInput = {
+    const newPost: Partial<PostAttributes> = {
       ...testPostData,
       title: 'Test Post 6',
       blogId,
@@ -238,7 +238,7 @@ describe('Post API', () => {
 
   it('should return 404 when updating a non-existent post', async () => {
     const nonExistentId = ObjectId.createFromTime(999999);
-    const updateData: PostInput = {
+    const updateData: Partial<PostAttributes> = {
       title: 'Updated Title',
       shortDescription: 'Updated Short Description',
       content: 'Updated Content',

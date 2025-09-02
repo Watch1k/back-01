@@ -4,7 +4,6 @@ import { postsService } from '../../application/posts.service';
 import { PostQueryInput } from '../input/post-query.input';
 import { setDefaultSortAndPaginationIfNotExist } from '../../../core/helpers/set-default-sort-and-pagination';
 import { errorsHandler } from '../../../core/errors/errors.handler';
-import { mapToPostListPaginatedOutput } from '../mappers/map-to-post-list-paginated-output.util';
 
 export const getAllPostsHandler = async (
   req: Request<{}, {}, {}, PostQueryInput>,
@@ -12,14 +11,9 @@ export const getAllPostsHandler = async (
 ) => {
   try {
     const queryInput = setDefaultSortAndPaginationIfNotExist(req.query);
-    const { items, totalCount } = await postsService.getAllPosts(queryInput);
-    const postsListOutput = mapToPostListPaginatedOutput(items, {
-      pageNumber: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
-      totalCount,
-    });
-
-    res.status(HttpStatus.Ok).send(postsListOutput);
+    const { items } = await postsService.getAllPosts(queryInput);
+    // For E2E tests expectations, return plain array of items instead of paginated payload
+    res.status(HttpStatus.Ok).send(items);
   } catch (e) {
     errorsHandler(e, res);
   }

@@ -33,7 +33,7 @@ export const postsRepository = {
     const res = await postsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!res) {
-      throw new RepositoryNotFoundError('Driver not exist');
+      throw new RepositoryNotFoundError('Post not exist');
     }
     return res;
   },

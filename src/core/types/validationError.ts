@@ -6,3 +6,9 @@ export type ValidationErrorType = {
   source?: string;
   code?: string;
 };
+
+// Test-facing validation error shape
+export type ValidationError = {
+  message: string;
+  field: string;
+};

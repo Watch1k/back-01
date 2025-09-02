@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { RepositoryNotFoundError } from './repository-not-found.error';
 import { HttpStatus } from '../types/http-statuses';
 import { DomainError } from './domain.error';
-import { createErrorMessages } from '../middlewares/validation/input-validtion-result.middleware';
+import { createErrorMessages } from '../middlewares/validation/input-validation-result.middleware';
 
 export function errorsHandler(error: unknown, res: Response): void {
   if (error instanceof RepositoryNotFoundError) {
@@ -11,8 +11,8 @@ export function errorsHandler(error: unknown, res: Response): void {
     res.status(httpStatus).send(
       createErrorMessages([
         {
-          status: httpStatus,
-          detail: error.message,
+          field: 'id',
+          message: error.message,
         },
       ]),
     );
@@ -26,10 +26,8 @@ export function errorsHandler(error: unknown, res: Response): void {
     res.status(httpStatus).send(
       createErrorMessages([
         {
-          status: httpStatus,
-          source: error.source,
-          detail: error.message,
-          code: error.code,
+          field: error.source ?? 'unknown',
+          message: error.message,
         },
       ]),
     );

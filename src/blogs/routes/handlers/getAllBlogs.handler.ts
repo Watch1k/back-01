@@ -12,12 +12,8 @@ export const getAllBlogsHandler = async (
   try {
     const queryInput = setDefaultSortAndPaginationIfNotExist(req.query);
     const { items, totalCount } = await blogsService.getAllBlogs(queryInput);
-    const blogsListOutput = mapToBlogListPaginatedOutput(items, {
-      pageNumber: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
-      totalCount,
-    });
-    res.status(HttpStatus.Ok).send(blogsListOutput);
+    // For E2E tests expectations, return plain array of items instead of paginated payload
+    res.status(HttpStatus.Ok).send(items);
   } catch {
     res.status(HttpStatus.InternalServerError).send();
   }

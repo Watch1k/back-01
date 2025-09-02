@@ -5,29 +5,22 @@ import {
 } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatus } from '../../types/http-statuses';
-import { ValidationErrorType } from '../../types/validationError';
-import { ValidationErrorListOutput } from '../../types/validationError.dto';
+import { ValidationError as OutputValidationError } from '../../types/validationError';
 
 export const createErrorMessages = (
-  errors: ValidationErrorType[],
-): ValidationErrorListOutput => {
+  errors: OutputValidationError[],
+): { errorsMessages: OutputValidationError[] } => {
   return {
-    errors: errors.map((error) => ({
-      status: error.status,
-      detail: error.detail, //error message
-      source: { pointer: error.source ?? '' }, //error field
-      code: error.code ?? null, //domain error code
-    })),
+    errorsMessages: errors,
   };
 };
 
-const formatValidationError = (error: ValidationError): ValidationErrorType => {
+const formatValidationError = (error: ValidationError): OutputValidationError => {
   const expressError = error as unknown as FieldValidationError;
 
   return {
-    status: HttpStatus.BadRequest,
-    source: expressError.path,
-    detail: expressError.msg,
+    field: expressError.path,
+    message: expressError.msg,
   };
 };
 
