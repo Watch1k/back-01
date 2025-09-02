@@ -1,14 +1,14 @@
 import request from 'supertest';
 import { setupApp } from '../../../src/setup-app';
 import express from 'express';
-import { PostInput } from '../../../src/posts/dto/post.input';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
-import { BlogCreateInput } from '../../../src/blogs/dto/blog-create.input';
 import { ValidationError } from '../../../src/core/types/validationError';
 import { clearDb } from '../../utils/clear-db';
 import { stopDb } from '../../../src/db/mongo.db';
 import { startDb } from '../../utils/start-db';
+import { BlogAttributes } from '../../../src/blogs/application/dtos/blog-attributes';
+import { PostAttributes } from '../../../src/posts/application/dtos/post-attributes';
 
 describe('Post API body validation check', () => {
   const app = express();
@@ -27,14 +27,14 @@ describe('Post API body validation check', () => {
   });
 
   // Test blog data to create a blog for posts
-  const testBlogData: BlogCreateInput = {
+  const testBlogData: BlogAttributes = {
     name: 'Test Blog',
     description: 'Test Description',
     websiteUrl: 'https://test-blog.com',
   };
 
   // Correct post data
-  const correctPostData: Omit<PostInput, 'blogId'> = {
+  const correctPostData: Omit<PostAttributes, 'blogId'> = {
     title: 'Test Post',
     shortDescription: 'Test Short Description',
     content: 'Test Content',

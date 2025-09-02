@@ -15,7 +15,9 @@ export const createErrorMessages = (
   };
 };
 
-const formatValidationError = (error: ValidationError): OutputValidationError => {
+const formatValidationError = (
+  error: ValidationError,
+): OutputValidationError => {
   const expressError = error as unknown as FieldValidationError;
 
   return {
