@@ -92,7 +92,7 @@ describe('Post API', () => {
     expect(postListResponse.body).toStrictEqual({
       items: [createResponse2.body, createResponse1.body],
       page: 1,
-      pageCount: 1,
+      pagesCount: 1,
       pageSize: 10,
       totalCount: 2,
     });
