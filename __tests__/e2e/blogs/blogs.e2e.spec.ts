@@ -39,16 +39,6 @@ describe('Blog API', () => {
     await stopDb();
   });
 
-  it('should create blog; POST /api/blogs', async () => {
-    const newBlog = {
-      ...testBlogData,
-      name: 'New Test Blog',
-    };
-
-    const response = await authRequest('post', '/api/blogs').send(newBlog);
-    expect(response.status).toBe(HttpStatus.Created);
-  });
-
   it('should return blogs list; GET /api/blogs', async () => {
     const newBlog1 = {
       ...testBlogData,
@@ -72,8 +62,23 @@ describe('Blog API', () => {
     const blogListResponse = await request(app).get('/api/blogs');
     expect(blogListResponse.status).toBe(HttpStatus.Ok);
 
-    expect(blogListResponse.body).toBeInstanceOf(Array);
-    expect(blogListResponse.body.length).toBeGreaterThanOrEqual(2);
+    expect(blogListResponse.body).toStrictEqual({
+      items: [createResponse2.body, createResponse1.body],
+      page: 1,
+      pageCount: 1,
+      pageSize: 10,
+      totalCount: 2,
+    });
+  });
+
+  it('should create blog; POST /api/blogs', async () => {
+    const newBlog = {
+      ...testBlogData,
+      name: 'New Test Blog',
+    };
+
+    const response = await authRequest('post', '/api/blogs').send(newBlog);
+    expect(response.status).toBe(HttpStatus.Created);
   });
 
   it('should return blog by id; GET /api/blogs/:id', async () => {

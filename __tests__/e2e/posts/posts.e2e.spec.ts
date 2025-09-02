@@ -64,23 +64,6 @@ describe('Post API', () => {
     blogId = createBlogResponse.body.id;
   });
 
-  it('should create post; POST /api/posts', async () => {
-    const newPost: Partial<PostAttributes> = {
-      ...testPostData,
-      title: 'New Test Post',
-      blogId,
-    };
-
-    const response = await authRequest('post', '/api/posts').send(newPost);
-    expect(response.status).toBe(HttpStatus.Created);
-    expect(response.body.title).toBe(newPost.title);
-    expect(response.body.shortDescription).toBe(newPost.shortDescription);
-    expect(response.body.content).toBe(newPost.content);
-    expect(response.body.blogId).toBe(newPost.blogId);
-    expect(response.body.id).toBeDefined();
-    expect(response.body.createdAt).toBeDefined();
-  });
-
   it('should return posts list; GET /api/posts', async () => {
     const newPost1: Partial<PostAttributes> = {
       ...testPostData,
@@ -106,8 +89,30 @@ describe('Post API', () => {
     const postListResponse = await request(app).get('/api/posts');
     expect(postListResponse.status).toBe(HttpStatus.Ok);
 
-    expect(postListResponse.body).toBeInstanceOf(Array);
-    expect(postListResponse.body.length).toBeGreaterThanOrEqual(2);
+    expect(postListResponse.body).toStrictEqual({
+      items: [createResponse2.body, createResponse1.body],
+      page: 1,
+      pageCount: 1,
+      pageSize: 10,
+      totalCount: 2,
+    });
+  });
+
+  it('should create post; POST /api/posts', async () => {
+    const newPost: Partial<PostAttributes> = {
+      ...testPostData,
+      title: 'New Test Post',
+      blogId,
+    };
+
+    const response = await authRequest('post', '/api/posts').send(newPost);
+    expect(response.status).toBe(HttpStatus.Created);
+    expect(response.body.title).toBe(newPost.title);
+    expect(response.body.shortDescription).toBe(newPost.shortDescription);
+    expect(response.body.content).toBe(newPost.content);
+    expect(response.body.blogId).toBe(newPost.blogId);
+    expect(response.body.id).toBeDefined();
+    expect(response.body.createdAt).toBeDefined();
   });
 
   it('should return post by id; GET /api/posts/:id', async () => {
