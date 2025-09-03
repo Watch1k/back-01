@@ -72,13 +72,19 @@ describe('Blog API', () => {
   });
 
   it('should create blog; POST /api/blogs', async () => {
-    const newBlog = {
+    const newBlog1 = {
+      ...testBlogData,
+      name: 'New Test Blog',
+    };
+    const newBlog2 = {
       ...testBlogData,
       name: 'New Test Blog',
     };
 
-    const response = await authRequest('post', '/api/blogs').send(newBlog);
-    expect(response.status).toBe(HttpStatus.Created);
+    await authRequest('post', '/api/blogs').send(newBlog1);
+    await authRequest('post', '/api/blogs').send(newBlog2);
+    const response = await authRequest('get', '/api/blogs');
+    expect(response.body.items.length).toBe(2);
   });
 
   it('should return blog by id; GET /api/blogs/:id', async () => {

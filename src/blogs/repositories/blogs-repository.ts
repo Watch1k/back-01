@@ -37,16 +37,8 @@ export const blogsRepository = {
     return res;
   },
 
-  createBlog: async (blog: BlogAttributes): Promise<string> => {
-    const newBlog: Blog = {
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      isMembership: false,
-      createdAt: new Date(),
-    };
-
-    const resp = await blogsCollection.insertOne(newBlog);
+  createBlog: async (blog: Blog): Promise<string> => {
+    const resp = await blogsCollection.insertOne(blog);
 
     return resp.insertedId.toString();
   },
