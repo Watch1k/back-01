@@ -1,5 +1,5 @@
 import { blogsCollection, postsCollection } from '../../db/mongo.db';
-import { ObjectId, WithId } from 'mongodb';
+import { Filter, ObjectId, WithId } from 'mongodb';
 import { RepositoryNotFoundError } from '../../core/errors/repository-not-found.error';
 import { Blog } from '../domain/blog';
 import { BlogAttributes } from '../application/dtos/blog-attributes';
@@ -7,12 +7,19 @@ import { BlogQueryInput } from '../routes/input/blog-query.input';
 
 export const blogsRepository = {
   getAllBlogs: async (query: BlogQueryInput) => {
-    const { pageNumber, pageSize, sortBy, sortDirection } = query;
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
+      query;
 
     const skip = (pageNumber - 1) * pageSize;
 
+    const filter: Filter<Blog> = {};
+
+    if (searchNameTerm) {
+      filter.name = { $regex: searchNameTerm, $options: 'i' };
+    }
+
     const items = await blogsCollection
-      .find()
+      .find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
